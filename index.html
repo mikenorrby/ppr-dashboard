@@ -272,6 +272,326 @@
         </div>
       </div>
 
+      <!-- Line Summary -->
+      <div class="section">
+        <div class="section-title">Line Summary</div>
+        <div class="emp-grid">
+          ${['Line 1','Line 2','Line 3'].map((ln,i) => {
+            const lineEmps = emps.filter(e=>e.line===ln);
+            const lineUnits = lineEmps.reduce((s,e)=>s+e.units,0);
+            const cls = ['l1','l2','l3'][i];
+            return `
+              <div class="emp-card ${cls}">
+                <div class="emp-name">${ln}</div>
+                <div class="emp-units">${lineUnits.toLocaleString()}</div>
+                <div class="emp-pph">${lineEmps.length} employee${lineEmps.length!==1?'s':''}</div>
+              </div>`;
+          }).join('')}
+        </div><!-- Chart -->
+      <div class="section">
+        <div class="section-title">Hourly Production</div>
+        <div class="chart-card">
+          <canvas id="hourlyChart" height="80"></canvas>
+        </div>
+      </div>
+
+      <!-- Employees -->
+      <div class="section">
+        <div class="section-title">Employee Breakdown</div>
+        <div class="emp-grid">
+          ${emps.map(e => {
+            const cls = e.line==='Line 1'?'l1':e.line==='Line 2'?'l2':'l3';
+            const tgt = 84;
+            const pill = e.pph >= tgt
+              ? '<span class="status-pill pill-green">On Target</span>'
+              : e.pph >= tgt*0.9
+              ? '<span class="status-pill pill-amber">Near Target</span>'
+              : '<span class="status-pill pill-red">Below Target</span>';
+            return `
+              <div class="emp-card ${cls}">
+                <div class="emp-name">${e.name}</div>
+                <div class="emp-line">${e.line}</div>
+                <div class="emp-units">${e.units.toLocaleString()}</div>
+                <div class="emp-pph">${e.pph} u/hr &nbsp; ${pill}</div>
+              </div>`;
+          }).join('')}
+        </div>
+      </div>
+
+      l>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neato Warehouse PPR Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; }
+
+  .header {
+    background: linear-gradient(135deg, #1F3864, #2E75B6);
+    padding: 16px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  }
+  .header h1 { font-size: 1.4rem; font-weight: 700; color: #fff; }
+  .header .sub { font-size: 0.8rem; color: #BDD7EE; margin-top: 2px; }
+  .last-updated { font-size: 0.75rem; color: #94a3b8; text-align: right; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; padding: 16px; }
+
+  .kpi {
+    background: #1e293b; border-radius: 10px; padding: 16px;
+    border-left: 4px solid #2E75B6; text-align: center;
+  }
+  .kpi.green  { border-color: #22c55e; }
+  .kpi.red    { border-color: #ef4444; }
+  .kpi.amber  { border-color: #f59e0b; }
+  .kpi.purple { border-color: #8b5cf6; }
+  .kpi-label  { font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; }
+  .kpi-value  { font-size: 2rem; font-weight: 700; margin: 4px 0; color: #f1f5f9; }
+  .kpi-sub    { font-size: 0.75rem; color: #64748b; }
+
+  .section { padding: 0 16px 16px; }
+  .section-title {
+    font-size: 0.85rem; font-weight: 700; color: #94a3b8;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    margin-bottom: 10px; padding-bottom: 6px;
+    border-bottom: 1px solid #334155;
+  }
+
+  .chart-card {
+    background: #1e293b; border-radius: 10px; padding: 16px;
+    margin-bottom: 12px;
+  }
+  .chart-title { font-size: 0.85rem; color: #94a3b8; margin-bottom: 12px; }
+
+  .emp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
+  .emp-card {
+    background: #1e293b; border-radius: 8px; padding: 12px;
+    border-left: 3px solid #2E75B6;
+  }
+  .emp-card.l1 { border-color: #1F78B4; }
+  .emp-card.l2 { border-color: #2CA02C; }
+  .emp-card.l3 { border-color: #D95F02; }
+  .emp-name  { font-size: 0.85rem; font-weight: 700; color: #f1f5f9; }
+  .emp-line  { font-size: 0.7rem; color: #64748b; margin-bottom: 6px; }
+  .emp-units { font-size: 1.4rem; font-weight: 700; color: #38bdf8; }
+  .emp-pph   { font-size: 0.75rem; color: #94a3b8; }
+
+  .progress-bar {
+    background: #334155; border-radius: 99px; height: 8px;
+    overflow: hidden; margin: 8px 0;
+  }
+  .progress-fill {
+    height: 100%; border-radius: 99px;
+    background: linear-gradient(90deg, #2E75B6, #22c55e);
+    transition: width 0.8s ease;
+  }
+
+  .no-data {
+    text-align: center; padding: 60px 20px; color: #64748b;
+    font-size: 1rem;
+  }
+  .no-data .icon { font-size: 3rem; margin-bottom: 12px; }
+
+  .status-pill {
+    display: inline-block; padding: 2px 10px; border-radius: 99px;
+    font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+  }
+  .pill-green  { background: #166534; color: #86efac; }
+  .pill-red    { background: #7f1d1d; color: #fca5a5; }
+  .pill-amber  { background: #78350f; color: #fcd34d; }
+
+  .refresh-btn {
+    background: #2E75B6; color: white; border: none;
+    padding: 8px 16px; border-radius: 6px; cursor: pointer;
+    font-size: 0.8rem; font-weight: 600;
+  }
+  .refresh-btn:hover { background: #1F3864; }
+
+  @media (max-width: 600px) {
+    .kpi-value { font-size: 1.5rem; }
+    .header h1 { font-size: 1.1rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="h1" style="font-size:1.4rem;font-weight:700;color:#fff">
+      🏭 Neato Warehouse PPR
+    </div>
+    <div class="sub" id="shift-date">Loading...</div>
+  </div>
+  <div style="text-align:right">
+    <div class="last-updated" id="last-updated">--</div>
+    <button class="refresh-btn" onclick="loadData()" style="margin-top:6px">↻ Refresh</button>
+  </div>
+</div>
+
+<div id="main-content">
+  <div class="no-data">
+    <div class="icon">📊</div>
+    <div>Loading shift data...</div>
+  </div>
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, doc, getDoc, collection, orderBy, limit, getDocs, query }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyD1QTqyxIO9x55SamCOYhBMDE37fSvhz5E",
+    authDomain: "neato-warehouse-ppr.firebaseapp.com",
+    projectId: "neato-warehouse-ppr",
+    storageBucket: "neato-warehouse-ppr.firebasestorage.app",
+    messagingSenderId: "1081562590282",
+    appId: "1:1081562590282:web:0945754ec9620963080ab3"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getFirestore(app);
+
+  let chartInstance = null;
+
+  window.loadData = async function() {
+    try {
+      // Get most recent shift document
+      const shiftsRef = collection(db, "shifts");
+      const q = query(shiftsRef, orderBy("date", "desc"), limit(1));
+      const snap = await getDocs(q);
+
+      if (snap.empty) {
+        document.getElementById('main-content').innerHTML = `
+          <div class="no-data">
+            <div class="icon">📭</div>
+            <div>No shift data yet.</div>
+            <div style="font-size:0.8rem;margin-top:8px;color:#475569">
+              Run refresh_ppr.py to push today's data.
+            </div>
+          </div>`;
+        return;
+      }
+
+      const d = snap.docs[0].data();
+      renderDashboard(d);
+    } catch(err) {
+      document.getElementById('main-content').innerHTML = `
+        <div class="no-data">
+          <div class="icon">⚠️</div>
+          <div>Error loading data</div>
+          <div style="font-size:0.8rem;margin-top:8px;color:#ef4444">${err.message}</div>
+          <div style="font-size:0.75rem;margin-top:8px;color:#475569">
+            Make sure Firestore is enabled in your Firebase project.
+          </div>
+        </div>`;
+    }
+  };
+
+  function renderDashboard(d) {
+    const total    = d.totalActual || 0;
+    const goal     = d.totalGoal   || 8000;
+    const variance = d.variance    || 0;
+    const pct      = d.pctGoal     || 0;
+    const trend    = d.trendingEOD || 0;
+    const actuals  = d.hourlyActuals  || [];
+    const goals    = d.hourlyGoals    || [];
+    const trending = d.hourlyTrending || [];
+    const labels   = d.hourLabels    || ["7AM","8AM","9AM","10AM","11AM","12PM","1PM","2PM","3PM"];
+    const emps     = d.employees      || [];
+
+    document.getElementById('shift-date').textContent =
+      `Shift Date: ${d.date || '--'}`;
+    window._currentDate = d.date;
+    document.getElementById('last-updated').textContent =
+      `Last refreshed: ${d.lastUpdated || '--'}`;
+
+    // Calculate daily goal based on day of week (with manual override)
+    const shiftDate   = new Date(d.date + 'T12:00:00');
+    const dayOfWeek   = shiftDate.getDay(); // 0=Sun, 5=Fri
+    const isFriday    = dayOfWeek === 5;
+    const autoGoal    = isFriday ? 6000 : 8000;
+
+    // Check for manual override stored in localStorage
+    const savedGoal     = localStorage.getItem('ppr_daily_goal_' + d.date);
+    const goalIsCustom  = savedGoal !== null;
+    const displayGoal   = goalIsCustom ? parseInt(savedGoal) : autoGoal;
+
+    const pctStatus = pct >= 100 ? 'green' : pct >= 85 ? 'amber' : 'red';
+    const varClass  = variance >= 0 ? 'green' : 'red';
+    const varSign   = variance >= 0 ? '+' : '';
+
+    // Filter to active hours only (where actuals > 0)
+    const activeIdx    = actuals.map((v,i)=>v>0?i:-1).filter(i=>i>=0);
+    const activeLabels = activeIdx.map(i=>labels[i]);
+    const activeActuals= activeIdx.map(i=>actuals[i]);
+    const n = activeIdx.length;
+
+    // Cumulative actual — running sum of slot actuals
+    const cumActual = activeActuals.reduce((acc,v,i)=>[...acc,(acc[i-1]||0)+v],[]);
+
+    // Cumulative goal — use per-slot goals if available, otherwise distribute evenly
+    const activeGoals = activeIdx.map(i=>(goals && goals[i]>0) ? goals[i] : Math.round(goal / 9));
+    const cumGoal = activeGoals.reduce((acc,v,i)=>[...acc,(acc[i-1]||0)+v],[]);
+
+    // Trend EOD — per-slot projection showing how EOD estimate changes each hour
+    // e.g. [6648, 6528, 7547, 8099, 8575, 8748, 7960] — dynamic line
+    const trendLine = activeIdx.map(i => (trending && trending[i] > 0) ? trending[i] : null);
+
+    // Trending EOD KPI = last active slot projection (most current estimate)
+    const currentTrend = trendLine.filter(v => v !== null).slice(-1)[0] || trend;
+
+    document.getElementById('main-content').innerHTML = `
+      <!-- KPI Row -->
+      <div class="grid">
+        <div class="kpi" id="goalCard">
+          <div class="kpi-label">Daily Goal</div>
+          <div class="kpi-value" id="goalDisplay" onclick="editGoal()" 
+               style="cursor:pointer;" title="Click to edit">
+            ${displayGoal.toLocaleString()}
+          </div>
+          <div class="kpi-sub" id="goalSub">
+            ${goalIsCustom ? '✏️ Custom goal' : (isFriday ? 'Friday schedule' : 'Mon–Thu schedule')}
+          </div>
+        </div>
+        <div class="kpi ${pctStatus}">
+          <div class="kpi-label">Units Produced</div>
+          <div class="kpi-value">${total.toLocaleString()}</div>
+          <div class="kpi-sub">${pct}% of goal</div>
+        </div>
+        <div class="kpi ${varClass}">
+          <div class="kpi-label">Variance</div>
+          <div class="kpi-value">${varSign}${variance.toLocaleString()}</div>
+          <div class="kpi-sub">${pct}% of goal</div>
+        </div>
+        <div class="kpi purple">
+          <div class="kpi-label">Trending EOD</div>
+          <div class="kpi-value">${(currentTrend||trend).toLocaleString()}</div>
+          <div class="kpi-sub">Projected end of day</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">Employees</div>
+          <div class="kpi-value">${emps.length}</div>
+          <div class="kpi-sub">Active today</div>
+        </div>
+      </div>
+
+      <!-- Progress bar -->
+      <div class="section">
+        <div style="display:flex;justify-content:space-between;font-size:0.75rem;color:#64748b;margin-bottom:4px">
+          <span>Progress to Goal</span>
+          <span>${Math.min(pct,100).toFixed(1)}%</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width:${Math.min(pct,100)}%"></div>
+        </div>
+      </div>
+
       <!-- Chart -->
       <div class="section">
         <div class="section-title">Hourly Production</div>
@@ -303,22 +623,7 @@
         </div>
       </div>
 
-      <!-- Line Summary -->
-      <div class="section">
-        <div class="section-title">Line Summary</div>
-        <div class="emp-grid">
-          ${['Line 1','Line 2','Line 3'].map((ln,i) => {
-            const lineEmps = emps.filter(e=>e.line===ln);
-            const lineUnits = lineEmps.reduce((s,e)=>s+e.units,0);
-            const cls = ['l1','l2','l3'][i];
-            return `
-              <div class="emp-card ${cls}">
-                <div class="emp-name">${ln}</div>
-                <div class="emp-units">${lineUnits.toLocaleString()}</div>
-                <div class="emp-pph">${lineEmps.length} employee${lineEmps.length!==1?'s':''}</div>
-              </div>`;
-          }).join('')}
-        </div>
+      
       </div>
     `;
 
