@@ -310,7 +310,15 @@
 
       <!-- Employees -->
       <div class="section">
-        <div class="section-title">Employee Breakdown</div>
+        <div class="section-title" style="display:flex;justify-content:space-between;align-items:center;">
+          <span>Employee Breakdown</span>
+          <button onclick="toggleEmployees()" id="empToggleBtn"
+            style="background:#2E75B6;color:white;border:none;padding:4px 12px;
+                   border-radius:6px;cursor:pointer;font-size:0.75rem;font-weight:600;">
+            Hide
+          </button>
+        </div>
+        <div id="empGrid">
         <div class="emp-grid">
           ${emps.map(e => {
             const cls = e.line==='Line 1'?'l1':e.line==='Line 2'?'l2':'l3';
