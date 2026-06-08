@@ -224,7 +224,7 @@
     const trendLine = activeIdx.map(i => (trending && trending[i] > 0) ? trending[i] : null);
 
     // Trending EOD KPI = last active slot projection (most current estimate)
-    const currentTrend = trendLine.filter(v => v !== null).slice(-1)[0] || trend;
+    const currentTrend = trend;  // Use Firebase trendingEOD directly
 
     document.getElementById('main-content').innerHTML = `
       <!-- KPI Row -->
