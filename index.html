@@ -26,6 +26,12 @@
     border-left: 4px solid #2E75B6; text-align: center;
   }
   .kpi.green  { border-color: #22c55e; }
+  .kpi.exceeded {
+    border-color: #22c55e;
+    border-width: 2px;
+    background: #052e16;
+    box-shadow: 0 0 18px rgba(34,197,94,0.35);
+  }
   .kpi.red    { border-color: #ef4444; }
   .kpi.amber  { border-color: #f59e0b; }
   .kpi.purple { border-color: #8b5cf6; }
@@ -239,10 +245,11 @@
             ${goalIsCustom ? '✏️ Custom goal' : (isFriday ? 'Friday schedule' : 'Mon–Thu schedule')}
           </div>
         </div>
-        <div class="kpi ${pctStatus}">
-          <div class="kpi-label">Units Produced</div>
-          <div class="kpi-value">${total.toLocaleString()}</div>
-          <div class="kpi-sub">${pct}% of goal</div>
+        <div class="kpi ${pct >= 100 ? 'exceeded' : pctStatus}">
+          <div class="kpi-label" style="${pct >= 100 ? 'color:#86efac' : ''}">Units Produced</div>
+          <div class="kpi-value" style="${pct >= 100 ? 'color:#4ade80' : ''}">${total.toLocaleString()}</div>
+          <div class="kpi-sub" style="${pct >= 100 ? 'color:#86efac' : ''}">${pct}% of goal</div>
+          ${pct >= 100 ? '<div style="font-size:0.7rem;color:#4ade80;margin-top:6px;font-weight:700">GOAL EXCEEDED</div>' : ''}
         </div>
         <div class="kpi ${varClass}">
           <div class="kpi-label">Variance</div>
