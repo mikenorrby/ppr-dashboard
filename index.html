@@ -50,6 +50,7 @@
   .chart-card {
     background: #1e293b; border-radius: 10px; padding: 16px;
     margin-bottom: 12px;
+    overflow: hidden;
   }
   .chart-title { font-size: 0.85rem; color: #94a3b8; margin-bottom: 12px; }
 
@@ -125,7 +126,36 @@
   </div>
 </div>
 
+<!-- Employee Breakdown — persistent outside main refresh -->
+<div id="empSection" class="section">
+  <div class="section-title" style="display:flex;justify-content:space-between;align-items:center;">
+    <span>Employee Breakdown</span>
+    <button id="empToggleBtn"
+      style="background:#2E75B6;color:white;border:none;padding:4px 12px;
+             border-radius:6px;cursor:pointer;font-size:0.75rem;font-weight:600;">
+      Hide
+    </button>
+  </div>
+  <div id="empGrid" class="emp-grid"></div>
+</div>
+
 <!-- Firebase SDK -->
+<script>
+  var _empVisible = true;
+  function toggleEmployees() {
+    _empVisible = !_empVisible;
+    var grid = document.getElementById('empGrid');
+    var btn  = document.getElementById('empToggleBtn');
+    if (grid) grid.style.display = _empVisible ? '' : 'none';
+    if (btn)  btn.textContent    = _empVisible ? 'Hide' : 'Show';
+  }
+  // Wire up button click
+  document.addEventListener('DOMContentLoaded', function() {
+    var btn = document.getElementById('empToggleBtn');
+    if (btn) btn.addEventListener('click', toggleEmployees);
+  });
+</script>
+
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getFirestore, doc, getDoc, collection, orderBy, limit, getDocs, query }
@@ -304,7 +334,7 @@
       <div class="section">
         <div class="section-title">Hourly Production</div>
         <div class="chart-card">
-          <canvas id="hourlyChart" height="80"></canvas>
+          <canvas id="hourlyChart" height="80" style="width:100% !important;"></canvas>
         </div>
       </div>
 
@@ -342,6 +372,28 @@
       
       </div>
     `;
+
+    // Update employee grid (persistent outside main innerHTML)
+    const empGridEl = document.getElementById('empGrid');
+    if (empGridEl) {
+      empGridEl.innerHTML = emps.map(e => {
+        const cls = e.line==='Line 1'?'l1':e.line==='Line 2'?'l2':'l3';
+        const tgt = 84;
+        const pill = e.pph >= tgt
+          ? '<span class="status-pill pill-green">On Target</span>'
+          : e.pph >= tgt*0.9
+          ? '<span class="status-pill pill-amber">Near Target</span>'
+          : '<span class="status-pill pill-red">Below Target</span>';
+        return `<div class="emp-card ${cls}">
+          <div class="emp-name">${e.name}</div>
+          <div class="emp-line">${e.line}</div>
+          <div class="emp-units">${e.units.toLocaleString()}</div>
+          <div class="emp-pph">${e.pph} u/hr &nbsp; ${pill}</div>
+        </div>`;
+      }).join('');
+      // Re-apply visibility state
+      empGridEl.style.display = _empVisible ? '' : 'none';
+    }
 
     // Build chart after DOM is ready
     setTimeout(() => {
@@ -397,6 +449,9 @@
           responsive: true,
           maintainAspectRatio: true,
           aspectRatio: 3,
+          animation: { duration: 0 },
+          transitions: { active: { animation: { duration: 0 } } },
+          resizeDelay: 0,
           plugins: {
             legend: { labels: { color: '#94a3b8', font: { size: 10 } } },
             tooltip: { mode: 'index', intersect: false }
