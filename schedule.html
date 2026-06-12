@@ -235,9 +235,14 @@ function doLogin() {
   if (!email) { err.textContent = 'Enter your email address.'; return; }
   if (!pin || pin.length !== 4) { err.textContent = 'Enter your 4-digit PIN.'; return; }
 
-  // Admin
-  if (email === 'mike.norrby@neato.com' && pin === '0000') {
-    currentUser = { email: email, name: 'Mike Norrby', isAdmin: true };
+  // Admin accounts
+  var admins = {
+    'mike.norrby@neato.com':    { name: 'Mike Norrby',     pin: '0000' },
+    'alison.ratering@neato.com': { name: 'Alison Ratering', pin: '0000' },
+    'shane.odell@neato.com':     { name: 'Shane O'Dell',   pin: '0000' }
+  };
+  if (admins[email] && admins[email].pin === pin) {
+    currentUser = { email: email, name: admins[email].name, isAdmin: true };
     enterApp(); return;
   }
 
