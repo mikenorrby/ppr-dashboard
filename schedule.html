@@ -173,7 +173,8 @@ body { font-family: Calibri, Arial, sans-serif; background: #f0f0f0; color: #000
     <div class="login-sub">Employee Schedule Portal</div>
 
     <label class="login-label">Email Address</label>
-    <input class="login-input" type="email" id="loginEmail" placeholder="your@email.com" autocomplete="email">
+    <input class="login-input" type="email" id="loginEmail" placeholder="your@email.com" autocomplete="email"
+      onkeydown="if(event.key==='Enter'){document.getElementById('loginPin').focus();}">
 
     <label class="login-label">4-Digit PIN</label>
     <div class="pin-dots" id="pinDots">
@@ -183,7 +184,8 @@ body { font-family: Calibri, Arial, sans-serif; background: #f0f0f0; color: #000
       <div class="pin-dot" id="dot3"></div>
     </div>
     <input class="login-input" type="password" id="loginPin" placeholder="Enter 4-digit PIN"
-      maxlength="4" inputmode="numeric" pattern="[0-9]*" oninput="updateDots(this.value)">
+      maxlength="4" inputmode="numeric" pattern="[0-9]*" oninput="updateDots(this.value)"
+      onkeydown="if(event.key==='Enter'){doLogin();}">
 
     <button class="login-btn" onclick="doLogin()">View My Schedule</button>
     <div class="login-error" id="loginError"></div>
@@ -202,7 +204,8 @@ body { font-family: Calibri, Arial, sans-serif; background: #f0f0f0; color: #000
       maxlength="4" inputmode="numeric" pattern="[0-9]*">
     <label class="login-label">Confirm PIN</label>
     <input class="login-input" type="password" id="confirmPin" placeholder="Confirm PIN"
-      maxlength="4" inputmode="numeric" pattern="[0-9]*">
+      maxlength="4" inputmode="numeric" pattern="[0-9]*"
+      onkeydown="if(event.key==='Enter'){saveNewPin();}">
     <button class="login-btn" onclick="saveNewPin()">Save PIN & Continue</button>
     <div class="login-error" id="pinChangeError"></div>
   </div>
