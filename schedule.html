@@ -329,32 +329,42 @@ function doLogin() {
   var pin   = (document.getElementById('loginPin').value || '').trim();
   var err   = document.getElementById('loginError');
 
+  err.textContent = '';
+
   if (!email) { err.textContent = 'Please enter your email address.'; return; }
-  if (!pin || pin.length !== 4) { err.textContent = 'Please enter your 4-digit PIN.'; return; }
+  if (!/^\S+@\S+\.\S+$/.test(email)) { err.textContent = 'Please enter a valid email address.'; return; }
+  if (!pin) { err.textContent = 'Please enter your 4-digit PIN.'; return; }
+  if (pin.length !== 4) { err.textContent = 'PIN must be exactly 4 digits.'; return; }
 
-  var users = getUsers();
-
-  // Admin check
+  // Admin check — hardcoded, always works
   if (email === 'mike.norrby@neato.com' && pin === '0000') {
     currentUser = { email: email, name: 'Mike Norrby', isAdmin: true };
     enterApp();
     return;
   }
 
+  var users = getUsers();
+
   // Check if email exists
-  if (!users[email]) { err.textContent = 'Email not found. Contact your manager to be added.'; return; }
+  if (!users[email]) {
+    err.textContent = 'Email not recognized. Contact your manager to be added.';
+    return;
+  }
 
   var user = users[email];
 
-  // Check PIN
-  if (user.pin === '1234' && pin === '1234') {
-    // First time login — force PIN change
+  // First time login with default PIN
+  if (pin === '1234' && user.pin === '1234') {
     currentUser = { email: email, name: user.name, isAdmin: false };
     showChangePin('first');
     return;
   }
 
-  if (user.pin !== pin) { err.textContent = 'Incorrect PIN. Please try again.'; return; }
+  // Wrong PIN
+  if (user.pin !== pin) {
+    err.textContent = 'Incorrect PIN. Please try again. First time? Use PIN: 1234';
+    return;
+  }
 
   currentUser = { email: email, name: user.name, isAdmin: false };
   enterApp();
