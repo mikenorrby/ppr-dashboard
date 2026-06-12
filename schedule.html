@@ -6,524 +6,357 @@
 <title>Neato Warehouse Schedule</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: Calibri, Arial, sans-serif; background: #f0f0f0; color: #000; font-size: 13px; }
+body { font-family: Calibri, Arial, sans-serif; background: #f0f0f0; font-size: 13px; }
 
-/* ── Login Screen ─────────────────────────────── */
-#loginScreen {
-  display: flex; align-items: center; justify-content: center;
-  min-height: 100vh; background: #1F3864;
-}
-.login-card {
-  background: #fff; border-radius: 10px; padding: 36px 40px;
-  width: 100%; max-width: 360px; text-align: center;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-}
-.login-logo { font-size: 2.2rem; margin-bottom: 6px; }
-.login-title { font-size: 1.2rem; font-weight: 700; color: #1F3864; margin-bottom: 4px; }
-.login-sub { font-size: 0.8rem; color: #888; margin-bottom: 24px; }
-.login-label { font-size: 0.78rem; font-weight: 700; color: #595959; text-align: left; margin-bottom: 4px; display: block; }
-.login-input {
-  width: 100%; padding: 10px 12px; border: 1px solid #ccc;
-  border-radius: 5px; font-size: 0.9rem; margin-bottom: 14px;
-  font-family: Calibri, Arial, sans-serif; outline: none;
-}
-.login-input:focus { border-color: #2E75B6; }
-.login-btn {
-  width: 100%; background: #1F3864; color: #fff;
-  border: none; padding: 11px; border-radius: 5px;
-  font-size: 0.95rem; font-weight: 700; cursor: pointer;
-  font-family: Calibri, Arial, sans-serif;
-}
-.login-btn:hover { background: #2E75B6; }
-.login-error { color: #c00; font-size: 0.8rem; margin-top: 10px; min-height: 18px; }
-.pin-dots { display: flex; justify-content: center; gap: 12px; margin: 10px 0 16px; }
-.pin-dot {
-  width: 14px; height: 14px; border-radius: 50%;
-  border: 2px solid #2E75B6; background: #fff;
-  transition: background 0.15s;
-}
-.pin-dot.filled { background: #2E75B6; }
+/* Login */
+#loginScreen { display:flex; align-items:center; justify-content:center; min-height:100vh; background:#1F3864; }
+.login-card { background:#fff; border-radius:10px; padding:36px 40px; width:100%; max-width:360px; text-align:center; box-shadow:0 8px 32px rgba(0,0,0,0.3); }
+.login-logo { font-size:2.5rem; margin-bottom:8px; }
+.login-title { font-size:1.2rem; font-weight:700; color:#1F3864; margin-bottom:4px; }
+.login-sub { font-size:0.8rem; color:#888; margin-bottom:24px; }
+.lbl { font-size:0.78rem; font-weight:700; color:#595959; text-align:left; margin-bottom:4px; display:block; margin-top:12px; }
+.inp { width:100%; padding:10px 12px; border:1px solid #ccc; border-radius:5px; font-size:0.9rem; font-family:inherit; outline:none; }
+.inp:focus { border-color:#2E75B6; }
+.btn { width:100%; background:#1F3864; color:#fff; border:none; padding:12px; border-radius:5px; font-size:0.95rem; font-weight:700; cursor:pointer; font-family:inherit; margin-top:18px; }
+.btn:hover { background:#2E75B6; }
+.err { color:#c00; font-size:0.82rem; margin-top:10px; min-height:18px; }
+.hint { margin-top:10px; font-size:0.72rem; color:#aaa; }
 
-/* ── Change PIN Screen ────────────────────────── */
-#changePinScreen { display: none; }
-.change-card {
-  background: #fff; border-radius: 10px; padding: 36px 40px;
-  width: 100%; max-width: 360px; text-align: center;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-}
+/* Change PIN */
+#changePinScreen { display:none; align-items:center; justify-content:center; min-height:100vh; background:#1F3864; }
 
-/* ── App Header ───────────────────────────────── */
-#appScreen { display: none; }
-.app-header {
-  background: #1F3864; color: #fff;
-  padding: 12px 20px; display: flex; align-items: center; justify-content: space-between;
-}
-.app-header h1 { font-size: 1.1rem; font-weight: 700; }
-.app-header .sub { font-size: 0.75rem; color: #BDD7EE; }
-.logout-btn {
-  background: rgba(255,255,255,0.15); color: #fff; border: none;
-  padding: 5px 12px; border-radius: 4px; cursor: pointer; font-size: 0.78rem;
-  font-family: Calibri, Arial, sans-serif;
-}
-.logout-btn:hover { background: rgba(255,255,255,0.25); }
-.change-pin-link {
-  color: #BDD7EE; font-size: 0.72rem; cursor: pointer;
-  text-decoration: underline; margin-right: 10px;
-}
+/* App */
+#appScreen { display:none; }
+.app-header { background:#1F3864; color:#fff; padding:12px 20px; display:flex; align-items:center; justify-content:space-between; }
+.app-header h1 { font-size:1.1rem; font-weight:700; }
+.app-sub { font-size:0.75rem; color:#BDD7EE; }
+.hdr-btns { display:flex; align-items:center; gap:8px; }
+.hdr-btn { background:rgba(255,255,255,0.15); color:#fff; border:none; padding:5px 12px; border-radius:4px; cursor:pointer; font-size:0.78rem; font-family:inherit; }
+.hdr-btn:hover { background:rgba(255,255,255,0.25); }
 
-/* ── Week tabs ─────────────────────────────────── */
-.tab-bar { background: #2E75B6; display: flex; gap: 4px; padding: 8px 16px 0; }
-.tab-btn {
-  background: #dce6f1; color: #1F3864; border: none; cursor: pointer;
-  padding: 7px 18px; font-size: 0.82rem; font-weight: 700;
-  border-radius: 4px 4px 0 0; font-family: Calibri, Arial, sans-serif;
-}
-.tab-btn.active { background: #fff; color: #1F3864; }
-.tab-btn .badge {
-  display: inline-block; background: #375623; color: #fff;
-  font-size: 0.6rem; padding: 1px 5px; border-radius: 3px; margin-left: 4px; font-weight: 700;
-}
+.tab-bar { background:#2E75B6; display:flex; gap:4px; padding:8px 16px 0; }
+.tab-btn { background:#dce6f1; color:#1F3864; border:none; cursor:pointer; padding:7px 18px; font-size:0.82rem; font-weight:700; border-radius:4px 4px 0 0; font-family:inherit; }
+.tab-btn.active { background:#fff; }
+.badge { display:inline-block; background:#375623; color:#fff; font-size:0.6rem; padding:1px 5px; border-radius:3px; margin-left:4px; }
 
-/* ── Toolbar ───────────────────────────────────── */
-.toolbar {
-  background: #fff; border-bottom: 2px solid #2E75B6;
-  padding: 8px 16px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
-}
-.search-box {
-  padding: 5px 10px; border: 1px solid #bbb; border-radius: 3px;
-  font-size: 0.82rem; font-family: Calibri, Arial, sans-serif;
-  width: 220px; outline: none;
-}
-.search-box:focus { border-color: #2E75B6; }
-.upload-btn-label {
-  background: #1F3864; color: #fff; padding: 5px 14px; border-radius: 3px;
-  cursor: pointer; font-size: 0.8rem; font-weight: 700;
-  font-family: Calibri, Arial, sans-serif;
-}
-.upload-btn-label:hover { background: #2E75B6; }
-#fileInput { display: none; }
-#uploadStatus { font-size: 0.75rem; color: #375623; }
+.toolbar { background:#fff; border-bottom:2px solid #2E75B6; padding:8px 16px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.search-box { padding:5px 10px; border:1px solid #bbb; border-radius:3px; font-size:0.82rem; font-family:inherit; width:220px; outline:none; }
+.search-box:focus { border-color:#2E75B6; }
+.upload-lbl { background:#1F3864; color:#fff; padding:5px 14px; border-radius:3px; cursor:pointer; font-size:0.8rem; font-weight:700; font-family:inherit; }
+.upload-lbl:hover { background:#2E75B6; }
+.upload-lbl.green { background:#375623; }
+.upload-lbl.green:hover { background:#4a7a2f; }
+#fileInput, #empFileInput { display:none; }
 
-/* ── Schedule table ────────────────────────────── */
-.schedule-wrap { padding: 12px 16px 24px; overflow-x: auto; }
-.sched-table {
-  border-collapse: collapse; width: 100%; min-width: 700px;
-  background: #fff; border: 1px solid #999; font-size: 12px;
-  font-family: Calibri, Arial, sans-serif;
-}
-.sched-table .row-days th {
-  background: #FFFF99; font-weight: 700; text-align: center;
-  padding: 5px 8px; border: 1px solid #bbb; font-size: 12px;
-}
-.sched-table .row-days th:first-child { background: #fff; text-align: left; min-width: 170px; }
-.sched-table .row-days th.today-hdr { background: #FFEB9C; color: #9C5700; }
-.sched-table .row-dates td {
-  background: #FFFF99; font-weight: 700; text-align: center;
-  padding: 3px 8px; border: 1px solid #bbb; font-size: 11px; color: #595959;
-}
-.sched-table .row-dates td:first-child { background: #fff; text-align: left; }
-.sched-table .row-dates td.today-hdr { background: #FFEB9C; color: #9C5700; }
-.sched-table .row-section td {
-  background: #D6DCE4; font-weight: 700; font-size: 12px; padding: 4px 8px;
-  border: 1px solid #bbb; border-top: 2px solid #8496B0;
-  color: #1F3864; text-transform: uppercase; letter-spacing: 0.05em;
-}
-.sched-table .row-emp td {
-  padding: 4px 8px; border: 1px solid #ddd; text-align: center; background: #fff;
-}
-.sched-table .row-emp td:first-child {
-  text-align: left; font-weight: 600; background: #EEF4FB; color: #1F3864; white-space: nowrap;
-}
-.sched-table .row-emp:nth-child(even) td { background: #F7FBFF; }
-.sched-table .row-emp:nth-child(even) td:first-child { background: #DDE9F5; }
-.sched-table .row-emp.hidden { display: none; }
-.sched-table .row-emp.highlight td:first-child { background: #FFF3CD !important; font-size: 13px; }
-.cell-off     { color: #000; font-style: italic; }
-.cell-off-bg  { background: #D9D9D9 !important; }
-.cell-hours   { color: #1F3864; font-weight: 600; }
-.cell-oncall  { color: #9C5700; background: #FFEB9C !important; font-weight: 600; }
-.cell-pto     { color: #375623; background: #92D050 !important; font-weight: 700; }
-.cell-today   { background: #FFF3E0 !important; }
-.cell-today.cell-hours { color: #843C0C; }
+.schedule-wrap { padding:12px 16px 24px; overflow-x:auto; }
+.sched-table { border-collapse:collapse; width:100%; min-width:700px; background:#fff; border:1px solid #999; font-size:12px; font-family:inherit; }
+.sched-table .row-days th { background:#FFFF99; font-weight:700; text-align:center; padding:5px 8px; border:1px solid #bbb; }
+.sched-table .row-days th:first-child { background:#fff; text-align:left; min-width:170px; }
+.sched-table .row-days th.tday { background:#FFEB9C; color:#9C5700; }
+.sched-table .row-dates td { background:#FFFF99; font-weight:700; text-align:center; padding:3px 8px; border:1px solid #bbb; font-size:11px; color:#595959; }
+.sched-table .row-dates td:first-child { background:#fff; }
+.sched-table .row-dates td.tday { background:#FFEB9C; color:#9C5700; }
+.sched-table .row-section td { background:#D6DCE4; font-weight:700; padding:4px 8px; border:1px solid #bbb; border-top:2px solid #8496B0; color:#1F3864; text-transform:uppercase; letter-spacing:0.05em; }
+.sched-table .row-emp td { padding:4px 8px; border:1px solid #ddd; text-align:center; background:#fff; }
+.sched-table .row-emp td:first-child { text-align:left; font-weight:600; background:#EEF4FB; color:#1F3864; white-space:nowrap; }
+.sched-table .row-emp:nth-child(even) td { background:#F7FBFF; }
+.sched-table .row-emp:nth-child(even) td:first-child { background:#DDE9F5; }
+.sched-table .row-emp.hidden { display:none; }
+.sched-table .row-emp.myrow td { background:#FFFDE7 !important; }
+.sched-table .row-emp.myrow td:first-child { background:#FFF9C4 !important; font-size:13px; }
+.off { color:#000; font-style:italic; background:#D9D9D9 !important; }
+.hours { color:#1F3864; font-weight:600; }
+.oncall { color:#9C5700; background:#FFEB9C !important; font-weight:600; }
+.pto { color:#375623; background:#92D050 !important; font-weight:700; }
+.tday-cell { background:#FFF3E0 !important; }
 
-/* ── Admin panel ──────────────────────────────── */
-#adminPanel { display: none; }
-.admin-card {
-  background: #fff; border-radius: 8px; padding: 20px; margin: 16px;
-  border: 1px solid #ddd;
-}
-.admin-title { font-size: 1rem; font-weight: 700; color: #1F3864; margin-bottom: 12px; }
-.emp-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-.emp-table th { background: #1F3864; color: #fff; padding: 6px 10px; text-align: left; }
-.emp-table td { padding: 5px 10px; border-bottom: 1px solid #eee; }
-.emp-table tr:hover td { background: #f5f8fc; }
-.reset-btn {
-  background: #7f1d1d; color: #fff; border: none; padding: 3px 8px;
-  border-radius: 3px; cursor: pointer; font-size: 0.72rem;
-}
+/* Admin panel */
+#adminPanel { display:none; padding:0 16px 24px; }
+.admin-card { background:#fff; border-radius:8px; padding:20px; border:1px solid #ddd; }
+.admin-title { font-size:1rem; font-weight:700; color:#1F3864; margin-bottom:12px; display:flex; justify-content:space-between; }
+.add-row { display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap; align-items:flex-end; }
+.add-inp { padding:5px 8px; border:1px solid #ccc; border-radius:3px; font-size:0.82rem; font-family:inherit; }
+.add-btn { background:#375623; color:#fff; border:none; padding:6px 14px; border-radius:3px; cursor:pointer; font-size:0.82rem; font-weight:700; font-family:inherit; }
+.emp-table { width:100%; border-collapse:collapse; font-size:12px; }
+.emp-table th { background:#1F3864; color:#fff; padding:6px 10px; text-align:left; }
+.emp-table td { padding:5px 10px; border-bottom:1px solid #eee; }
+.act-btn { border:none; padding:3px 8px; border-radius:3px; cursor:pointer; font-size:0.72rem; font-family:inherit; margin-right:3px; color:#fff; }
+.act-btn.blue { background:#1F3864; }
+.act-btn.red { background:#7f1d1d; }
+.act-btn.orange { background:#9C5700; }
 </style>
 </head>
 <body>
 
-<!-- ── LOGIN SCREEN ──────────────────────────── -->
+<!-- LOGIN -->
 <div id="loginScreen">
   <div class="login-card">
     <div class="login-logo">🏭</div>
     <div class="login-title">Neato Warehouse</div>
     <div class="login-sub">Employee Schedule Portal</div>
-
-    <label class="login-label">Email Address</label>
-    <input class="login-input" type="email" id="loginEmail" placeholder="your@email.com" autocomplete="email"
-      onkeydown="if(event.key==='Enter'){document.getElementById('loginPin').focus();}">
-
-    <label class="login-label">4-Digit PIN</label>
-    <div class="pin-dots" id="pinDots">
-      <div class="pin-dot" id="dot0"></div>
-      <div class="pin-dot" id="dot1"></div>
-      <div class="pin-dot" id="dot2"></div>
-      <div class="pin-dot" id="dot3"></div>
-    </div>
-    <input class="login-input" type="password" id="loginPin" placeholder="Enter 4-digit PIN"
-      maxlength="4" inputmode="numeric" pattern="[0-9]*" oninput="updateDots(this.value)"
-      onkeydown="if(event.key==='Enter'){doLogin();}">
-
-    <button class="login-btn" onclick="doLogin()">View My Schedule</button>
-    <div class="login-error" id="loginError"></div>
-    <div style="margin-top:12px;font-size:0.72rem;color:#aaa">First time? Use PIN: <strong>1234</strong></div>
+    <label class="lbl">Email Address</label>
+    <input class="inp" type="email" id="loginEmail" placeholder="your@email.com">
+    <label class="lbl">4-Digit PIN</label>
+    <input class="inp" type="password" id="loginPin" placeholder="Enter PIN" maxlength="4" inputmode="numeric">
+    <button class="btn" id="loginBtn">View My Schedule</button>
+    <div class="err" id="loginErr"></div>
+    <div class="hint">First time? Use PIN: <strong>1234</strong></div>
   </div>
 </div>
 
-<!-- ── CHANGE PIN SCREEN ───────────────────────── -->
+<!-- CHANGE PIN -->
 <div id="changePinScreen" style="display:none;align-items:center;justify-content:center;min-height:100vh;background:#1F3864;">
-  <div class="change-card">
+  <div class="login-card">
     <div class="login-logo">🔒</div>
     <div class="login-title">Set Your PIN</div>
-    <div class="login-sub" id="changePinSub">Choose a new 4-digit PIN for your account</div>
-    <label class="login-label">New PIN</label>
-    <input class="login-input" type="password" id="newPin" placeholder="New 4-digit PIN"
-      maxlength="4" inputmode="numeric" pattern="[0-9]*">
-    <label class="login-label">Confirm PIN</label>
-    <input class="login-input" type="password" id="confirmPin" placeholder="Confirm PIN"
-      maxlength="4" inputmode="numeric" pattern="[0-9]*"
-      onkeydown="if(event.key==='Enter'){saveNewPin();}">
-    <button class="login-btn" onclick="saveNewPin()">Save PIN & Continue</button>
-    <div class="login-error" id="pinChangeError"></div>
+    <div class="login-sub" id="cpSub">Choose a personal 4-digit PIN</div>
+    <label class="lbl">New PIN</label>
+    <input class="inp" type="password" id="newPin" placeholder="New 4-digit PIN" maxlength="4" inputmode="numeric">
+    <label class="lbl">Confirm PIN</label>
+    <input class="inp" type="password" id="confirmPin" placeholder="Confirm PIN" maxlength="4" inputmode="numeric">
+    <button class="btn" id="savePinBtn">Save PIN & Continue</button>
+    <div class="err" id="cpErr"></div>
   </div>
 </div>
 
-<!-- ── APP SCREEN ─────────────────────────────── -->
-<div id="appScreen" style="display:none;">
-
+<!-- APP -->
+<div id="appScreen">
   <div class="app-header">
     <div>
-      <h1>🏭 Neato Warehouse — Schedule</h1>
-      <div class="sub" id="appSub">Welcome</div>
+      <h1>🏭 Neato Warehouse Schedule</h1>
+      <div class="app-sub" id="appSub"></div>
     </div>
-    <div style="display:flex;align-items:center;gap:8px;">
-      <span class="change-pin-link" onclick="showChangePinFromApp()">Change PIN</span>
-      <button class="logout-btn" onclick="doLogout()">Sign Out</button>
+    <div class="hdr-btns">
+      <button class="hdr-btn" id="changePinBtn">Change PIN</button>
+      <button class="hdr-btn" id="logoutBtn">Sign Out</button>
     </div>
   </div>
-
-  <!-- Admin only toolbar -->
   <div class="toolbar" id="adminToolbar" style="display:none;">
-    <label class="upload-btn-label">
+    <label class="upload-lbl">
       📂 Upload Schedule
-      <input type="file" id="fileInput" accept=".xlsx" onchange="handleUpload(event)">
+      <input type="file" id="fileInput" accept=".xlsx">
     </label>
-    <label class="upload-btn-label" style="background:#375623;">
+    <label class="upload-lbl green">
       👥 Upload Employee List
-      <input type="file" id="empFileInput" accept=".csv,.xlsx" onchange="handleEmpUpload(event)">
+      <input type="file" id="empFileInput" accept=".csv,.xlsx">
     </label>
-    <button onclick="showAdminPanel()" style="background:#8496B0;color:#fff;border:none;padding:5px 14px;border-radius:3px;cursor:pointer;font-size:0.8rem;font-weight:700;font-family:Calibri,Arial,sans-serif;">
-      ⚙ Manage Employees
-    </button>
-    <span id="uploadStatus"></span>
+    <button class="upload-lbl" style="background:#8496B0;" id="manageBtn">⚙ Manage Employees</button>
+    <span id="uploadStatus" style="font-size:0.75rem;color:#375623;"></span>
   </div>
-
-  <!-- Week tabs -->
   <div class="tab-bar" id="tabBar"></div>
-
-  <!-- Search toolbar -->
   <div class="toolbar">
-    <input class="search-box" id="searchInput" type="text" placeholder="🔍 Search employee name..." oninput="filterTable()">
-    <span id="myScheduleNote" style="font-size:0.78rem;color:#375623;font-weight:700;"></span>
+    <input class="search-box" id="searchInput" placeholder="🔍 Search employee name...">
+    <span id="myNote" style="font-size:0.78rem;color:#375623;font-weight:700;"></span>
   </div>
-
-  <!-- Schedule -->
   <div class="schedule-wrap" id="schedWrap"></div>
-
-  <!-- Admin panel -->
-  <div id="adminPanel" style="display:none;padding:0 16px 24px;">
+  <div id="adminPanel">
     <div class="admin-card">
-      <div class="admin-title" style="display:flex;justify-content:space-between;align-items:center;">
+      <div class="admin-title">
         <span>⚙ Employee Accounts</span>
         <span id="empCount" style="font-size:0.78rem;color:#888;font-weight:400;"></span>
       </div>
-
-      <!-- Add employee manually -->
-      <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:flex-end;">
-        <div>
-          <div style="font-size:0.72rem;font-weight:700;color:#595959;margin-bottom:3px;">Email</div>
-          <input id="addEmail" type="email" placeholder="employee@email.com"
-            style="padding:5px 8px;border:1px solid #ccc;border-radius:3px;font-size:0.82rem;width:220px;">
-        </div>
-        <div>
-          <div style="font-size:0.72rem;font-weight:700;color:#595959;margin-bottom:3px;">Name (Last, First)</div>
-          <input id="addName" type="text" placeholder="Smith, John"
-            style="padding:5px 8px;border:1px solid #ccc;border-radius:3px;font-size:0.82rem;width:180px;">
-        </div>
-        <button onclick="addEmployeeManually()"
-          style="background:#375623;color:#fff;border:none;padding:6px 14px;border-radius:3px;cursor:pointer;font-size:0.82rem;font-weight:700;font-family:Calibri,Arial,sans-serif;">
-          + Add Employee
-        </button>
-        <span id="addEmpError" style="font-size:0.75rem;color:#c00;"></span>
+      <div class="add-row">
+        <div><div style="font-size:0.72rem;font-weight:700;margin-bottom:3px;">Email</div>
+          <input class="add-inp" type="email" id="addEmail" placeholder="employee@email.com" style="width:220px;"></div>
+        <div><div style="font-size:0.72rem;font-weight:700;margin-bottom:3px;">Name</div>
+          <input class="add-inp" type="text" id="addName" placeholder="Last, First" style="width:180px;"></div>
+        <button class="add-btn" id="addEmpBtn">+ Add Employee</button>
+        <span id="addErr" style="font-size:0.75rem;color:#c00;"></span>
       </div>
-
-      <table class="emp-table" id="empTable">
+      <table class="emp-table">
         <thead><tr><th>Email</th><th>Name</th><th>PIN Status</th><th>Actions</th></tr></thead>
-        <tbody id="empTableBody"></tbody>
+        <tbody id="empBody"></tbody>
       </table>
     </div>
   </div>
-
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
-
-// ── Embedded schedule data ──────────────────────
 var SCHEDULES = [{"week_start": "2026-06-15", "days": [{"day": "Sunday", "date": "2026-06-14"}, {"day": "Monday", "date": "2026-06-15"}, {"day": "Tuesday", "date": "2026-06-16"}, {"day": "Wednesday", "date": "2026-06-17"}, {"day": "Thursday", "date": "2026-06-18"}, {"day": "Friday", "date": "2026-06-19"}, {"day": "Saturday", "date": "2026-06-20"}], "employees": [{"name": "Llanes, Yasluvia", "section": "", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Link, Michael", "section": "", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Sandoval Lunn, Ashley", "section": "", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Gamban, Biondee Carlo", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Flores, Maritza", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Herrera, Alexis", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "McAllister, Christopher", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Chavarria, America", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Vanderwal, Brynn", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "OFF", "2026-06-17": "7:00-16:00", "2026-06-18": "OFF", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Lewis, Sa'mauri", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Garner, Avner", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "VanArsdale, Trevor", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Riley, Jayden", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Mikasobe, Louie", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Riley, Jayden", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Walters, Roxy", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "On-Call", "2026-06-16": "On-Call", "2026-06-17": "On-Call", "2026-06-18": "On-Call", "2026-06-19": "On-Call", "2026-06-20": "OFF"}}, {"name": "Ware, Jada", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "On-Call", "2026-06-16": "On-Call", "2026-06-17": "On-Call", "2026-06-18": "On-Call", "2026-06-19": "On-Call", "2026-06-20": "OFF"}}, {"name": "Penaloza, Tommy", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "On-Call", "2026-06-16": "On-Call", "2026-06-17": "On-Call", "2026-06-18": "On-Call", "2026-06-19": "On-Call", "2026-06-20": "OFF"}}, {"name": "Davis, Rian", "section": "ICQA", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Padua, Breana", "section": "ICQA", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Rick, Reyes", "section": "Label Room", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Villanueva, Chelsy", "section": "Label Room", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Watkins, Traeveyous", "section": "Inbound/Outbound", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Reams, Cecil", "section": "Inbound/Outbound", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "On-Call", "2026-06-19": "OFF", "2026-06-20": "OFF"}}, {"name": "Luna, Frank", "section": "Inbound/Outbound", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Chea, Kamryn", "section": "Inbound/Outbound", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Quinn, Ravalle", "section": "Inbound/Outbound", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-16:00", "2026-06-20": "OFF"}}]}, {"week_start": "2026-06-22", "days": [{"day": "Sunday", "date": "2026-06-21"}, {"day": "Monday", "date": "2026-06-22"}, {"day": "Tuesday", "date": "2026-06-23"}, {"day": "Wednesday", "date": "2026-06-24"}, {"day": "Thursday", "date": "2026-06-25"}, {"day": "Friday", "date": "2026-06-26"}, {"day": "Saturday", "date": "2026-06-27"}], "employees": [{"name": "Llanes, Yasluvia", "section": "", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Link, Michael", "section": "", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Sandoval Lunn, Ashley", "section": "", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Gamban, Biondee Carlo", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Flores, Maritza", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Herrera, Alexis", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "McAllister, Christopher", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Chavarria, America", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Vanderwal, Brynn", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "OFF", "2026-06-24": "7:00-16:00", "2026-06-25": "OFF", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Lewis, Sa'mauri", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Garner, Avner", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "VanArsdale, Trevor", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Riley, Jayden", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Mikasobe, Louie", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Riley, Jayden", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Walters, Roxy", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "On-Call", "2026-06-23": "On-Call", "2026-06-24": "On-Call", "2026-06-25": "On-Call", "2026-06-26": "On-Call", "2026-06-27": "OFF"}}, {"name": "Ware, Jada", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "On-Call", "2026-06-23": "On-Call", "2026-06-24": "On-Call", "2026-06-25": "On-Call", "2026-06-26": "On-Call", "2026-06-27": "OFF"}}, {"name": "Penaloza, Tommy", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "On-Call", "2026-06-23": "On-Call", "2026-06-24": "On-Call", "2026-06-25": "On-Call", "2026-06-26": "On-Call", "2026-06-27": "OFF"}}, {"name": "Davis, Rian", "section": "ICQA", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Padua, Breana", "section": "ICQA", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Rick, Reyes", "section": "Label Room", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Villanueva, Chelsy", "section": "Label Room", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Watkins, Traeveyous", "section": "Inbound/Outbound", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Reams, Cecil", "section": "Inbound/Outbound", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "OFF", "2026-06-26": "OFF", "2026-06-27": "OFF"}}, {"name": "Luna, Frank", "section": "Inbound/Outbound", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Chea, Kamryn", "section": "Inbound/Outbound", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Quinn, Ravalle", "section": "Inbound/Outbound", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-16:00", "2026-06-27": "OFF"}}]}];
-
-// ── State ───────────────────────────────────────
 var schedules = SCHEDULES;
 var activeIdx = 0;
 var currentUser = null;
 
-// ── Storage helpers ─────────────────────────────
-function getUsers() {
-  try { return JSON.parse(localStorage.getItem('neato_users') || '{}'); } catch(e) { return {}; }
-}
+// Storage
+function getUsers() { try { return JSON.parse(localStorage.getItem('neato_users')||'{}'); } catch(e) { return {}; } }
 function saveUsers(u) { localStorage.setItem('neato_users', JSON.stringify(u)); }
-function getScheduleData() {
-  try {
-    var saved = localStorage.getItem('neato_schedules');
-    if (saved) {
-      var parsed = JSON.parse(saved);
-      if (parsed[0] && parsed[0].week_start >= SCHEDULES[0].week_start) return parsed;
-    }
-  } catch(e) {}
-  return SCHEDULES;
-}
 
-// ── PIN dots ────────────────────────────────────
-function updateDots(val) {
-  for (var i = 0; i < 4; i++) {
-    document.getElementById('dot' + i).classList.toggle('filled', i < val.length);
-  }
-}
+// ── Wire up all buttons on DOMContentLoaded ────
+document.addEventListener('DOMContentLoaded', function() {
 
-// ── Login ───────────────────────────────────────
+  // Login button
+  document.getElementById('loginBtn').addEventListener('click', doLogin);
+  document.getElementById('loginPin').addEventListener('keydown', function(e) { if(e.key==='Enter') doLogin(); });
+  document.getElementById('loginEmail').addEventListener('keydown', function(e) { if(e.key==='Enter') document.getElementById('loginPin').focus(); });
+
+  // Save PIN button
+  document.getElementById('savePinBtn').addEventListener('click', saveNewPin);
+  document.getElementById('confirmPin').addEventListener('keydown', function(e) { if(e.key==='Enter') saveNewPin(); });
+
+  // Logout
+  document.getElementById('logoutBtn').addEventListener('click', doLogout);
+
+  // Change PIN
+  document.getElementById('changePinBtn').addEventListener('click', function() {
+    document.getElementById('appScreen').style.display = 'none';
+    document.getElementById('changePinScreen').style.display = 'flex';
+    document.getElementById('cpSub').textContent = 'Choose a new 4-digit PIN.';
+    document.getElementById('newPin').value = '';
+    document.getElementById('confirmPin').value = '';
+    document.getElementById('cpErr').textContent = '';
+  });
+
+  // Search
+  document.getElementById('searchInput').addEventListener('input', filterTable);
+
+  // Manage employees toggle
+  document.getElementById('manageBtn').addEventListener('click', function() {
+    var p = document.getElementById('adminPanel');
+    p.style.display = p.style.display === 'none' ? 'block' : 'none';
+    if (p.style.display === 'block') renderAdminPanel();
+  });
+
+  // Add employee
+  document.getElementById('addEmpBtn').addEventListener('click', addEmployee);
+
+  // File uploads
+  document.getElementById('fileInput').addEventListener('change', handleScheduleUpload);
+  document.getElementById('empFileInput').addEventListener('change', handleEmpUpload);
+});
+
+// ── Login ──────────────────────────────────────
 function doLogin() {
-  var email = (document.getElementById('loginEmail').value || '').trim().toLowerCase();
-  var pin   = (document.getElementById('loginPin').value || '').trim();
-  var err   = document.getElementById('loginError');
-
+  var email = document.getElementById('loginEmail').value.trim().toLowerCase();
+  var pin   = document.getElementById('loginPin').value.trim();
+  var err   = document.getElementById('loginErr');
   err.textContent = '';
 
-  if (!email) { err.textContent = 'Please enter your email address.'; return; }
-  if (!/^\S+@\S+\.\S+$/.test(email)) { err.textContent = 'Please enter a valid email address.'; return; }
-  if (!pin) { err.textContent = 'Please enter your 4-digit PIN.'; return; }
-  if (pin.length !== 4) { err.textContent = 'PIN must be exactly 4 digits.'; return; }
+  if (!email) { err.textContent = 'Enter your email address.'; return; }
+  if (!pin || pin.length !== 4) { err.textContent = 'Enter your 4-digit PIN.'; return; }
 
-  // Admin check — hardcoded, always works
+  // Admin
   if (email === 'mike.norrby@neato.com' && pin === '0000') {
     currentUser = { email: email, name: 'Mike Norrby', isAdmin: true };
-    enterApp();
-    return;
+    enterApp(); return;
   }
 
   var users = getUsers();
+  if (!users[email]) { err.textContent = 'Email not found. Contact your manager.'; return; }
 
-  // Check if email exists
-  if (!users[email]) {
-    err.textContent = 'Email not recognized. Contact your manager to be added.';
+  var u = users[email];
+  if (pin === '1234' && u.pin === '1234') {
+    currentUser = { email: email, name: u.name, isAdmin: false };
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('changePinScreen').style.display = 'flex';
+    document.getElementById('cpSub').textContent = 'Welcome! Please set a personal PIN.';
     return;
   }
+  if (u.pin !== pin) { err.textContent = 'Incorrect PIN. First time? Use PIN: 1234'; return; }
 
-  var user = users[email];
-
-  // First time login with default PIN
-  if (pin === '1234' && user.pin === '1234') {
-    currentUser = { email: email, name: user.name, isAdmin: false };
-    showChangePin('first');
-    return;
-  }
-
-  // Wrong PIN
-  if (user.pin !== pin) {
-    err.textContent = 'Incorrect PIN. Please try again. First time? Use PIN: 1234';
-    return;
-  }
-
-  currentUser = { email: email, name: user.name, isAdmin: false };
+  currentUser = { email: email, name: u.name, isAdmin: false };
   enterApp();
 }
 
-// ── Change PIN ──────────────────────────────────
-function showChangePin(mode) {
-  document.getElementById('loginScreen').style.display = 'none';
-  var cs = document.getElementById('changePinScreen');
-  cs.style.display = 'flex';
-  if (mode === 'first') {
-    document.getElementById('changePinSub').textContent = 'Welcome! Please set a personal PIN to secure your account.';
-  } else {
-    document.getElementById('changePinSub').textContent = 'Choose a new 4-digit PIN.';
-  }
-}
-
-function showChangePinFromApp() {
-  document.getElementById('appScreen').style.display = 'none';
-  document.getElementById('changePinScreen').style.display = 'flex';
-  document.getElementById('changePinSub').textContent = 'Choose a new 4-digit PIN.';
-  document.getElementById('newPin').value = '';
-  document.getElementById('confirmPin').value = '';
-}
-
+// ── Save PIN ───────────────────────────────────
 function saveNewPin() {
-  var np  = (document.getElementById('newPin').value || '').trim();
-  var cp  = (document.getElementById('confirmPin').value || '').trim();
-  var err = document.getElementById('pinChangeError');
-
-  if (!np || np.length !== 4 || !/^\d{4}$/.test(np)) { err.textContent = 'PIN must be exactly 4 digits.'; return; }
-  if (np !== cp) { err.textContent = 'PINs do not match.'; return; }
-  if (np === '1234') { err.textContent = 'Please choose a different PIN (not 1234).'; return; }
-
-  var users = getUsers();
-  if (users[currentUser.email]) {
-    users[currentUser.email].pin = np;
-    saveUsers(users);
-  }
-
-  document.getElementById('changePinScreen').style.display = 'none';
+  var np  = document.getElementById('newPin').value.trim();
+  var cp  = document.getElementById('confirmPin').value.trim();
+  var err = document.getElementById('cpErr');
   err.textContent = '';
+  if (!np || np.length !== 4 || !/^[0-9]{4}$/.test(np)) { err.textContent = 'PIN must be 4 numbers.'; return; }
+  if (np !== cp) { err.textContent = 'PINs do not match.'; return; }
+  if (np === '1234') { err.textContent = 'Choose a different PIN.'; return; }
+  var users = getUsers();
+  if (users[currentUser.email]) { users[currentUser.email].pin = np; saveUsers(users); }
+  document.getElementById('changePinScreen').style.display = 'none';
   enterApp();
 }
 
-// ── Enter app ───────────────────────────────────
+// ── Enter app ──────────────────────────────────
 function enterApp() {
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('changePinScreen').style.display = 'none';
   document.getElementById('appScreen').style.display = 'block';
-
-  schedules = getScheduleData();
-
-  if (currentUser.isAdmin) {
-    document.getElementById('adminToolbar').style.display = 'flex';
-  }
-
-  document.getElementById('appSub').textContent = 'Logged in as: ' + currentUser.name + ' (' + currentUser.email + ')';
+  document.getElementById('appSub').textContent = 'Welcome, ' + currentUser.name;
+  if (currentUser.isAdmin) document.getElementById('adminToolbar').style.display = 'flex';
   buildTabs();
-
-  // Highlight current user's name in schedule
-  setTimeout(function() {
-    highlightMyRow();
-    var note = document.getElementById('myScheduleNote');
-    if (note) note.textContent = '★ Your row is highlighted in yellow';
-  }, 200);
 }
 
-// ── Highlight logged-in employee's row ──────────
-function highlightMyRow() {
-  var users = getUsers();
-  var user  = users[currentUser.email];
-  if (!user || !user.name) return;
-  var nameLower = user.name.toLowerCase();
-  document.querySelectorAll('.row-emp').forEach(function(r) {
-    var rname = (r.dataset.name || '').toLowerCase();
-    r.classList.toggle('highlight', rname === nameLower || rname.includes(nameLower) || nameLower.includes(rname));
-  });
-}
-
-// ── Logout ──────────────────────────────────────
+// ── Logout ─────────────────────────────────────
 function doLogout() {
   currentUser = null;
   document.getElementById('appScreen').style.display = 'none';
+  document.getElementById('adminToolbar').style.display = 'none';
+  document.getElementById('adminPanel').style.display = 'none';
   document.getElementById('loginScreen').style.display = 'flex';
   document.getElementById('loginEmail').value = '';
   document.getElementById('loginPin').value = '';
-  document.getElementById('loginError').textContent = '';
-  updateDots('');
+  document.getElementById('loginErr').textContent = '';
 }
 
-// ── Build tabs ──────────────────────────────────
+// ── Build tabs ─────────────────────────────────
 function buildTabs() {
   var today = new Date().toISOString().split('T')[0];
-  var autoActive = 0;
-  var html = '';
+  var auto  = 0;
+  var html  = '';
   schedules.forEach(function(s, i) {
-    var ws  = new Date(s.week_start + 'T12:00:00');
-    var we  = new Date(ws); we.setDate(we.getDate() + 6);
-    var weStr = we.toISOString().split('T')[0];
-    var label = (ws.getMonth()+1)+'/'+ws.getDate()+' – '+(we.getMonth()+1)+'/'+we.getDate()+'/'+we.getFullYear().toString().slice(2);
+    var ws = new Date(s.week_start + 'T12:00:00');
+    var we = new Date(ws); we.setDate(we.getDate() + 6);
+    var lbl = (ws.getMonth()+1)+'/'+ws.getDate()+' – '+(we.getMonth()+1)+'/'+we.getDate()+'/'+String(we.getFullYear()).slice(2);
     var badge = '';
-    if (today >= s.week_start && today <= weStr) {
-      badge = '<span class="badge">CURRENT</span>'; autoActive = i;
-    } else if (i > 0 && today > schedules[i-1].week_start) {
-      badge = '<span class="badge" style="background:#9C5700">NEXT</span>';
-    }
-    html += '<button class="tab-btn" onclick="renderSchedule(' + i + ')">' + label + badge + '</button>';
+    var weStr = we.toISOString().split('T')[0];
+    if (today >= s.week_start && today <= weStr) { badge = '<span class="badge">CURRENT</span>'; auto = i; }
+    else if (i > 0 && today > schedules[i-1].week_start) { badge = '<span class="badge" style="background:#9C5700">NEXT</span>'; }
+    html += '<button class="tab-btn" data-idx="'+i+'">'+lbl+badge+'</button>';
   });
-  document.getElementById('tabBar').innerHTML = html;
-  renderSchedule(autoActive);
+  var tabBar = document.getElementById('tabBar');
+  tabBar.innerHTML = html;
+  tabBar.querySelectorAll('.tab-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() { renderSchedule(parseInt(this.dataset.idx)); });
+  });
+  renderSchedule(auto);
 }
 
-// ── Render schedule ─────────────────────────────
+// ── Render schedule ────────────────────────────
 function renderSchedule(idx) {
   activeIdx = idx;
   var sched = schedules[idx];
   if (!sched) return;
-  document.querySelectorAll('.tab-btn').forEach(function(t, i) { t.classList.toggle('active', i === idx); });
+  document.querySelectorAll('.tab-btn').forEach(function(t) { t.classList.toggle('active', parseInt(t.dataset.idx) === idx); });
 
   var today = new Date().toISOString().split('T')[0];
-  var sections = {}, sectionOrder = [];
+  var sections = {}, order = [];
   sched.employees.forEach(function(e) {
-    var sec = e.section || 'General';
-    if (!sections[sec]) { sections[sec] = []; sectionOrder.push(sec); }
-    sections[sec].push(e);
+    var s = e.section || 'General';
+    if (!sections[s]) { sections[s] = []; order.push(s); }
+    sections[s].push(e);
   });
 
   var html = '<table class="sched-table"><thead>';
   html += '<tr class="row-days"><th>Employee</th>';
-  sched.days.forEach(function(d) {
-    var isT = d.date === today;
-    html += '<th class="' + (isT?'today-hdr':'') + '">' + d.day + '</th>';
-  });
+  sched.days.forEach(function(d) { html += '<th class="'+(d.date===today?'tday':'')+'">'+d.day+'</th>'; });
   html += '</tr><tr class="row-dates"><td></td>';
   sched.days.forEach(function(d) {
-    var isT = d.date === today;
-    var lbl = '';
-    if (d.date) { var dt = new Date(d.date+'T12:00:00'); lbl = (dt.getMonth()+1)+'/'+dt.getDate(); }
-    html += '<td class="'+(isT?'today-hdr':'')+'">'+lbl+(isT?' ★':'')+'</td>';
+    var lbl = d.date ? (function(){ var dt=new Date(d.date+'T12:00:00'); return (dt.getMonth()+1)+'/'+dt.getDate(); })() : '';
+    html += '<td class="'+(d.date===today?'tday':'')+'">'+lbl+(d.date===today?' ★':'')+'</td>';
   });
   html += '</tr></thead><tbody>';
 
-  sectionOrder.forEach(function(sec) {
+  order.forEach(function(sec) {
     html += '<tr class="row-section"><td colspan="'+(sched.days.length+1)+'">'+sec+'</td></tr>';
     sections[sec].forEach(function(emp) {
       html += '<tr class="row-emp" data-name="'+emp.name.toLowerCase()+'">';
       html += '<td>'+emp.name+'</td>';
       sched.days.forEach(function(d) {
-        var val = emp.shifts[d.date] || 'OFF';
-        var isT = d.date === today;
-        var cellCls = isT ? 'cell-today' : '';
-        var textCls = '', display = val;
-        var u = val.toLowerCase();
-        if (u === 'off') { textCls = 'cell-off'; cellCls += ' cell-off-bg'; }
-        else if (u === 'on-call') { textCls = 'cell-oncall'; display = 'On-Call'; }
-        else if (u === 'pto') { textCls = 'cell-pto'; display = 'PTO'; }
-        else { textCls = isT ? 'cell-today cell-hours' : 'cell-hours'; }
-        html += '<td class="'+[cellCls,textCls].filter(Boolean).join(' ')+'">'+display+'</td>';
+        var v = emp.shifts[d.date] || 'OFF';
+        var u = v.toLowerCase();
+        var cls = d.date === today ? 'tday-cell ' : '';
+        if (u === 'off') cls += 'off';
+        else if (u === 'on-call') cls += 'oncall';
+        else if (u === 'pto') cls += 'pto';
+        else cls += 'hours';
+        html += '<td class="'+cls.trim()+'">'+(u==='on-call'?'On-Call':v)+'</td>';
       });
       html += '</tr>';
     });
@@ -531,195 +364,172 @@ function renderSchedule(idx) {
   html += '</tbody></table>';
   document.getElementById('schedWrap').innerHTML = html;
   filterTable();
-  setTimeout(highlightMyRow, 50);
+  highlightMyRow();
 }
 
-// ── Filter ──────────────────────────────────────
+// ── Highlight my row ───────────────────────────
+function highlightMyRow() {
+  if (!currentUser) return;
+  var users = getUsers();
+  var u = users[currentUser.email];
+  if (!u) return;
+  var n = u.name.toLowerCase();
+  document.querySelectorAll('.row-emp').forEach(function(r) {
+    var rn = r.dataset.name || '';
+    r.classList.toggle('myrow', rn === n || rn.includes(n.split(',')[0].trim()) || n.includes(rn.split(',')[0].trim()));
+  });
+  var note = document.getElementById('myNote');
+  if (note) note.textContent = '★ Your schedule is highlighted';
+}
+
+// ── Filter ─────────────────────────────────────
 function filterTable() {
-  var q = (document.getElementById('searchInput').value||'').toLowerCase().trim();
+  var q = document.getElementById('searchInput').value.toLowerCase().trim();
   document.querySelectorAll('.row-emp').forEach(function(r) {
     r.classList.toggle('hidden', !!q && !(r.dataset.name||'').includes(q));
   });
 }
 
-// ── Admin: Upload employee list ─────────────────
-window.handleEmpUpload = function(evt) {
+// ── Admin: render panel ────────────────────────
+function renderAdminPanel() {
+  var users = getUsers();
+  var keys  = Object.keys(users);
+  document.getElementById('empCount').textContent = keys.length + ' employee' + (keys.length!==1?'s':'');
+  var html = '';
+  keys.sort().forEach(function(email) {
+    var u = users[email];
+    var pinSt = u.pin==='1234'
+      ? '<span style="color:#c00;font-weight:700;">Default</span>'
+      : '<span style="color:#375623;font-weight:700;">Set ✓</span>';
+    html += '<tr>' +
+      '<td>'+email+'</td><td>'+u.name+'</td><td>'+pinSt+'</td>' +
+      '<td>' +
+        '<button class="act-btn blue" data-action="edit" data-email="'+email+'">Edit</button>' +
+        '<button class="act-btn orange" data-action="reset" data-email="'+email+'">Reset PIN</button>' +
+        '<button class="act-btn red" data-action="remove" data-email="'+email+'">Remove</button>' +
+      '</td></tr>';
+  });
+  var tbody = document.getElementById('empBody');
+  tbody.innerHTML = html || '<tr><td colspan="4" style="text-align:center;color:#888;padding:12px;">No employees yet.</td></tr>';
+  tbody.querySelectorAll('.act-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var action = this.dataset.action;
+      var email  = this.dataset.email;
+      var users2 = getUsers();
+      if (action === 'remove') {
+        if (!confirm('Remove access for '+email+'?')) return;
+        delete users2[email]; saveUsers(users2);
+      } else if (action === 'reset') {
+        if (!confirm('Reset PIN for '+email+' to 1234?')) return;
+        users2[email].pin = '1234'; saveUsers(users2);
+      } else if (action === 'edit') {
+        var newName = prompt('Edit name for '+email+':', users2[email].name);
+        if (!newName || !newName.trim()) return;
+        users2[email].name = newName.trim(); saveUsers(users2);
+      }
+      renderAdminPanel();
+    });
+  });
+}
+
+// ── Add employee ───────────────────────────────
+function addEmployee() {
+  var email = document.getElementById('addEmail').value.trim().toLowerCase();
+  var name  = document.getElementById('addName').value.trim();
+  var err   = document.getElementById('addErr');
+  err.textContent = '';
+  if (!email || !email.includes('@')) { err.textContent = 'Enter a valid email.'; return; }
+  if (!name) { err.textContent = 'Enter a name.'; return; }
+  var users = getUsers();
+  if (users[email]) { err.textContent = 'Email already exists.'; return; }
+  users[email] = { name: name, pin: '1234' };
+  saveUsers(users);
+  document.getElementById('addEmail').value = '';
+  document.getElementById('addName').value = '';
+  document.getElementById('uploadStatus').textContent = '✓ Added '+name+' — default PIN: 1234';
+  renderAdminPanel();
+}
+
+// ── Upload employee list ───────────────────────
+function handleEmpUpload(evt) {
   var file = evt.target.files[0];
   if (!file) return;
   var reader = new FileReader();
   reader.onload = function(e) {
     try {
       var users = getUsers();
-      var lines, added = 0;
+      var added = 0;
       if (file.name.endsWith('.csv')) {
-        lines = e.target.result.split('\n');
-        lines.forEach(function(line) {
-          var parts = line.split(',');
-          var email = (parts[0]||'').trim().toLowerCase();
-          var name  = (parts[1]||'').trim();
-          if (email && email.includes('@')) {
-            if (!users[email]) { users[email] = { name: name, pin: '1234' }; added++; }
-          }
+        e.target.result.split('\n').forEach(function(line) {
+          var p = line.split(',');
+          var em = (p[0]||'').trim().toLowerCase();
+          var nm = (p[1]||'').trim();
+          if (em && em.includes('@') && !users[em]) { users[em]={name:nm,pin:'1234'}; added++; }
         });
       } else {
-        var wb = XLSX.read(e.target.result, { type: 'binary' });
-        var ws = wb.Sheets[wb.SheetNames[0]];
-        var rows = XLSX.utils.sheet_to_json(ws, { header: 1 });
-        rows.forEach(function(row) {
-          var email = (String(row[0]||'')).trim().toLowerCase();
-          var name  = (String(row[1]||'')).trim();
-          if (email && email.includes('@')) {
-            if (!users[email]) { users[email] = { name: name, pin: '1234' }; added++; }
-          }
+        var wb = XLSX.read(e.target.result, {type:'binary'});
+        XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header:1}).forEach(function(row) {
+          var em = String(row[0]||'').trim().toLowerCase();
+          var nm = String(row[1]||'').trim();
+          if (em && em.includes('@') && !users[em]) { users[em]={name:nm,pin:'1234'}; added++; }
         });
       }
       saveUsers(users);
-      document.getElementById('uploadStatus').textContent = '✓ ' + added + ' employees added (default PIN: 1234)';
+      document.getElementById('uploadStatus').textContent = '✓ '+added+' employees added';
       renderAdminPanel();
-    } catch(err) {
-      document.getElementById('uploadStatus').textContent = '✗ Error: ' + err.message;
-    }
+    } catch(err) { document.getElementById('uploadStatus').textContent = '✗ '+err.message; }
   };
   if (file.name.endsWith('.csv')) reader.readAsText(file);
   else reader.readAsBinaryString(file);
-};
+}
 
-// ── Admin: Upload schedule ──────────────────────
-window.handleUpload = function(evt) {
+// ── Upload schedule ────────────────────────────
+function handleScheduleUpload(evt) {
   var file = evt.target.files[0];
   if (!file) return;
   var reader = new FileReader();
   reader.onload = function(e) {
     try {
-      var parsed = parseExcel(e.target.result);
-      if (!parsed.length) throw new Error('No schedules found');
-      schedules = parsed;
+      var wb = XLSX.read(e.target.result, {type:'binary',cellDates:true});
+      var ws = wb.Sheets[wb.SheetNames[0]];
+      var SKW = ['deliveries','coordinator','production','icqa','label room','inbound','outbound','training'];
+      var cfgs = [{nc:0,ds:1},{nc:9,ds:10}];
+      var result = [];
+      cfgs.forEach(function(cfg) {
+        var days=[], emps=[], sec='', maxR=0;
+        Object.keys(ws).forEach(function(k){ if(k[0]!=='!'){var r=XLSX.utils.decode_cell(k);if(r.r>maxR)maxR=r.r;} });
+        for (var c=cfg.ds;c<cfg.ds+7;c++) {
+          var dc=XLSX.utils.encode_cell({r:0,c:c}), dtc=XLSX.utils.encode_cell({r:1,c:c});
+          var dn=ws[dc]?String(ws[dc].v||'').trim():['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][c-cfg.ds];
+          var dv=ws[dtc]?ws[dtc].v:null, ds2='';
+          if (dv instanceof Date) ds2=dv.toISOString().split('T')[0];
+          else if (typeof dv==='number'){var dd=new Date(Math.round((dv-25569)*86400*1000));ds2=dd.toISOString().split('T')[0];}
+          days.push({day:dn,date:ds2});
+        }
+        for (var r=3;r<=maxR;r++) {
+          var nc2=XLSX.utils.encode_cell({r:r,c:cfg.nc});
+          if (!ws[nc2]) continue;
+          var nm=String(ws[nc2].v||'').trim();
+          if (!nm) continue;
+          var svs=[];
+          for (var ci=cfg.ds;ci<cfg.ds+7;ci++){var sc2=XLSX.utils.encode_cell({r:r,c:ci});svs.push(ws[sc2]?String(ws[sc2].v||'').trim():'');}
+          var ne=svs.filter(function(v){return v&&v!=='`'&&v!=="'";});
+          if (SKW.some(function(k){return nm.toLowerCase().indexOf(k)!==-1;})||ne.length===0){sec=nm;continue;}
+          var shifts={};
+          days.forEach(function(d,di){var v=svs[di];shifts[d.date]=v&&v!=='`'&&v!=="'"?v:'OFF';});
+          emps.push({name:nm,section:sec,shifts:shifts});
+        }
+        if (days[1]&&days[1].date) result.push({week_start:days[1].date,days:days,employees:emps});
+      });
+      if (!result.length) throw new Error('No schedules found');
+      schedules = result;
       localStorage.setItem('neato_schedules', JSON.stringify(schedules));
       buildTabs();
-      document.getElementById('uploadStatus').textContent = '✓ Schedule updated (' + file.name + ')';
-    } catch(err) {
-      document.getElementById('uploadStatus').textContent = '✗ ' + err.message;
-    }
+      document.getElementById('uploadStatus').textContent = '✓ Schedule updated ('+file.name+')';
+    } catch(err2) { document.getElementById('uploadStatus').textContent = '✗ '+err2.message; }
   };
   reader.readAsBinaryString(file);
-};
-
-// ── Parse Excel ─────────────────────────────────
-function parseExcel(data) {
-  var wb = XLSX.read(data, { type: 'binary', cellDates: true });
-  var ws = wb.Sheets[wb.SheetNames[0]];
-  var result = [];
-  var SECTION_KW = ['deliveries','coordinator','production','icqa','label room','inbound','outbound','training'];
-  var configs = [{ nameCol:0, dayStart:1 }, { nameCol:9, dayStart:10 }];
-  configs.forEach(function(cfg) {
-    var days = [];
-    for (var c = cfg.dayStart; c < cfg.dayStart+7; c++) {
-      var dc = XLSX.utils.encode_cell({r:0,c:c});
-      var dtc = XLSX.utils.encode_cell({r:1,c:c});
-      var dn = ws[dc] ? String(ws[dc].v||'').trim() : ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][c-cfg.dayStart];
-      var dv = ws[dtc] ? ws[dtc].v : null;
-      var ds = '';
-      if (dv instanceof Date) ds = dv.toISOString().split('T')[0];
-      else if (typeof dv === 'number') { var dd=new Date(Math.round((dv-25569)*86400*1000)); ds=dd.toISOString().split('T')[0]; }
-      days.push({day:dn,date:ds});
-    }
-    var employees=[], curSec='', maxRow=0;
-    Object.keys(ws).forEach(function(k){ if(k[0]!=='!'){var r=XLSX.utils.decode_cell(k);if(r.r>maxRow)maxRow=r.r;} });
-    for (var r=3; r<=maxRow; r++) {
-      var nc=XLSX.utils.encode_cell({r:r,c:cfg.nameCol});
-      if (!ws[nc]) continue;
-      var name=String(ws[nc].v||'').trim();
-      if (!name) continue;
-      var svs=[];
-      for (var ci=cfg.dayStart;ci<cfg.dayStart+7;ci++){var sc=XLSX.utils.encode_cell({r:r,c:ci});svs.push(ws[sc]?String(ws[sc].v||'').trim():'');}
-      var nonEmpty=svs.filter(function(v){return v&&v!=='`'&&v!=="'";});
-      var isSec = SECTION_KW.some(function(k){return name.toLowerCase().indexOf(k)!==-1;}) || nonEmpty.length===0;
-      if (isSec) { curSec=name; continue; }
-      var shifts={};
-      days.forEach(function(d,di){var v=svs[di];shifts[d.date]=v&&v!=='`'&&v!=="'"?v:'OFF';});
-      employees.push({name:name,section:curSec,shifts:shifts});
-    }
-    var ws2=days[1]?days[1].date:'';
-    if (ws2) result.push({week_start:ws2,days:days,employees:employees});
-  });
-  return result;
 }
-
-// ── Admin panel ─────────────────────────────────
-function showAdminPanel() {
-  var panel = document.getElementById('adminPanel');
-  panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-  renderAdminPanel();
-}
-
-function renderAdminPanel() {
-  var users = getUsers();
-  var keys = Object.keys(users);
-  var html = '';
-  keys.forEach(function(email) {
-    var u = users[email];
-    var pinStatus = u.pin === '1234'
-      ? '<span style="color:#c00;font-weight:700;">Default (not set)</span>'
-      : '<span style="color:#375623;font-weight:700;">Set ✓</span>';
-    html += '<tr>' +
-      '<td>'+email+'</td>' +
-      '<td>'+u.name+'</td>' +
-      '<td>'+pinStatus+'</td>' +
-      '<td style="display:flex;gap:4px;flex-wrap:wrap;">' +
-        '<button class="reset-btn" onclick="resetPin(''+email+'')" title="Reset to default PIN 1234">Reset PIN</button>' +
-        '<button class="reset-btn" style="background:#1F3864;" onclick="editEmployee(''+email+'')" title="Edit name">Edit</button>' +
-        '<button class="reset-btn" style="background:#7f1d1d;" onclick="removeEmployee(''+email+'')" title="Remove access">Remove</button>' +
-      '</td></tr>';
-  });
-  document.getElementById('empTableBody').innerHTML = html ||
-    '<tr><td colspan="4" style="color:#888;padding:10px;text-align:center;">No employees added yet. Upload a list or add manually below.</td></tr>';
-  document.getElementById('empCount').textContent = keys.length + ' employee' + (keys.length !== 1 ? 's' : '');
-}
-
-function resetPin(email) {
-  if (!confirm('Reset PIN for ' + email + ' to default 1234?')) return;
-  var users = getUsers();
-  if (users[email]) { users[email].pin = '1234'; saveUsers(users); renderAdminPanel(); }
-}
-
-function removeEmployee(email) {
-  if (!confirm('Remove access for ' + email + '? This cannot be undone.')) return;
-  var users = getUsers();
-  delete users[email];
-  saveUsers(users);
-  renderAdminPanel();
-}
-
-function editEmployee(email) {
-  var users = getUsers();
-  var u = users[email];
-  if (!u) return;
-  var newName = prompt('Edit name for ' + email + ':', u.name);
-  if (newName === null) return;
-  newName = newName.trim();
-  if (!newName) { alert('Name cannot be empty.'); return; }
-  users[email].name = newName;
-  saveUsers(users);
-  renderAdminPanel();
-}
-
-function addEmployeeManually() {
-  var email = (document.getElementById('addEmail').value || '').trim().toLowerCase();
-  var name  = (document.getElementById('addName').value || '').trim();
-  var err   = document.getElementById('addEmpError');
-  if (!email || !email.includes('@')) { err.textContent = 'Enter a valid email.'; return; }
-  if (!name) { err.textContent = 'Enter employee name.'; return; }
-  var users = getUsers();
-  if (users[email]) { err.textContent = 'This email already exists.'; return; }
-  users[email] = { name: name, pin: '1234' };
-  saveUsers(users);
-  document.getElementById('addEmail').value = '';
-  document.getElementById('addName').value = '';
-  err.textContent = '';
-  renderAdminPanel();
-  document.getElementById('uploadStatus').textContent = '✓ Added ' + name + ' (' + email + ') — default PIN: 1234';
-}
-
 </script>
 </body>
 </html>
