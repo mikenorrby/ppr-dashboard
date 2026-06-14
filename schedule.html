@@ -178,8 +178,18 @@ var schedules = SCHEDULES;
 var activeIdx = 0;
 var currentUser = null;
 
+// Default employees — pre-loaded on first visit
+var DEFAULT_USERS = {"cabrerayasluvia@gmail.com": {"name": "Llanes, Yasluvia", "pin": "1234"}, "mikecv1113@gmail.com": {"name": "Link, Michael", "pin": "1234"}, "sandovalashley1999@gmail.com": {"name": "Sandoval Lunn, Ashley", "pin": "1234"}, "gorgebioncarlo1992@gmail.com": {"name": "Gamban, Biondee Carlo", "pin": "1234"}, "maritza.flores@neato.com": {"name": "Flores, Maritza", "pin": "1234"}, "alexherrera420420@outlook.com": {"name": "Herrera, Alexis", "pin": "1234"}, "krizomcallister@gmail.com": {"name": "McAllister, Christopher", "pin": "1234"}, "america.chavarria@yahoo.com": {"name": "Chavarria, America", "pin": "1234"}, "brynnvw44@gmail.com": {"name": "Vanderwal, Brynn", "pin": "1234"}, "samauril702@gmail.com": {"name": "Lewis, Sa'mauri", "pin": "1234"}, "avnervega@gmail.com": {"name": "Garner, Avner", "pin": "1234"}, "trevor.ex7@gmail.com": {"name": "VanArsdale, Trevor", "pin": "1234"}, "jaydenriley1132@gmail.com": {"name": "Riley, Jayden", "pin": "1234"}, "mikster8081@outlook.com": {"name": "Mikasobe, Louie", "pin": "1234"}, "roxywaltersjobs@gmail.com": {"name": "Walters, Roxy", "pin": "1234"}, "jadaware1@gmail.com": {"name": "Ware, Jada", "pin": "1234"}, "tommypenaloza896@gmail.com": {"name": "Penaloza, Tommy", "pin": "1234"}, "riandgirldad03@icloud.com": {"name": "Davis, Rian", "pin": "1234"}, "breana.padua20@gmail.com": {"name": "Padua, Breana", "pin": "1234"}, "reyesrick06@gmail.com": {"name": "Rick, Reyes", "pin": "1234"}, "chelsyxvilla@gmail.com": {"name": "Villanueva, Chelsy", "pin": "1234"}, "traeveyouswatkins1994@gmail.com": {"name": "Watkins, Traeveyous", "pin": "1234"}, "cecilreams@outlook.com": {"name": "Reams, Cecil", "pin": "1234"}, "epmoon88@gmail.com": {"name": "Luna, Frank", "pin": "1234"}, "kamrynchea2020@gmail.com": {"name": "Chea, Kamryn", "pin": "1234"}, "quinnravalle@gmail.com": {"name": "Quinn, Ravalle", "pin": "1234"}};
+
 // Storage
-function getUsers() { try { return JSON.parse(localStorage.getItem('neato_users')||'{}'); } catch(e) { return {}; } }
+function getUsers() {
+  try {
+    var stored = JSON.parse(localStorage.getItem('neato_users') || '{}');
+    // Merge defaults with any locally stored users (stored takes priority)
+    var merged = Object.assign({}, DEFAULT_USERS, stored);
+    return merged;
+  } catch(e) { return DEFAULT_USERS; }
+}
 function saveUsers(u) { localStorage.setItem('neato_users', JSON.stringify(u)); }
 
 // ── Wire up all buttons on DOMContentLoaded ────
