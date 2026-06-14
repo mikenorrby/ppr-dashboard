@@ -8,7 +8,6 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: Calibri, Arial, sans-serif; background: #f0f0f0; font-size: 13px; }
 
-/* Login */
 #loginScreen { display:flex; align-items:center; justify-content:center; min-height:100vh; background:#1F3864; }
 .login-card { background:#fff; border-radius:10px; padding:36px 40px; width:100%; max-width:360px; text-align:center; box-shadow:0 8px 32px rgba(0,0,0,0.3); }
 .login-logo { font-size:2.5rem; margin-bottom:8px; }
@@ -22,16 +21,13 @@ body { font-family: Calibri, Arial, sans-serif; background: #f0f0f0; font-size: 
 .err { color:#c00; font-size:0.82rem; margin-top:10px; min-height:18px; }
 .hint { margin-top:10px; font-size:0.72rem; color:#aaa; }
 
-/* Change PIN */
 #changePinScreen { display:none; align-items:center; justify-content:center; min-height:100vh; background:#1F3864; }
 
-/* App */
 #appScreen { display:none; }
 .app-header { background:#1F3864; color:#fff; padding:12px 20px; display:flex; align-items:center; justify-content:space-between; }
 .app-header h1 { font-size:1.1rem; font-weight:700; }
 .app-sub { font-size:0.75rem; color:#BDD7EE; }
-.hdr-btns { display:flex; align-items:center; gap:8px; }
-.hdr-btn { background:rgba(255,255,255,0.15); color:#fff; border:none; padding:5px 12px; border-radius:4px; cursor:pointer; font-size:0.78rem; font-family:inherit; }
+.hdr-btn { background:rgba(255,255,255,0.15); color:#fff; border:none; padding:5px 12px; border-radius:4px; cursor:pointer; font-size:0.78rem; font-family:inherit; margin-left:6px; }
 .hdr-btn:hover { background:rgba(255,255,255,0.25); }
 
 .tab-bar { background:#2E75B6; display:flex; gap:4px; padding:8px 16px 0; }
@@ -42,10 +38,8 @@ body { font-family: Calibri, Arial, sans-serif; background: #f0f0f0; font-size: 
 .toolbar { background:#fff; border-bottom:2px solid #2E75B6; padding:8px 16px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
 .search-box { padding:5px 10px; border:1px solid #bbb; border-radius:3px; font-size:0.82rem; font-family:inherit; width:220px; outline:none; }
 .search-box:focus { border-color:#2E75B6; }
-.upload-lbl { background:#1F3864; color:#fff; padding:5px 14px; border-radius:3px; cursor:pointer; font-size:0.8rem; font-weight:700; font-family:inherit; }
-.upload-lbl:hover { background:#2E75B6; }
-.upload-lbl.green { background:#375623; }
-.upload-lbl.green:hover { background:#4a7a2f; }
+.tbtn { color:#fff; border:none; padding:5px 14px; border-radius:3px; cursor:pointer; font-size:0.8rem; font-weight:700; font-family:inherit; }
+.upload-lbl { color:#fff; padding:5px 14px; border-radius:3px; cursor:pointer; font-size:0.8rem; font-weight:700; font-family:inherit; }
 #fileInput, #empFileInput { display:none; }
 
 .schedule-wrap { padding:12px 16px 24px; overflow-x:auto; }
@@ -70,20 +64,14 @@ body { font-family: Calibri, Arial, sans-serif; background: #f0f0f0; font-size: 
 .pto { color:#375623; background:#92D050 !important; font-weight:700; }
 .tday-cell { background:#FFF3E0 !important; }
 
-/* Admin panel */
-#adminPanel { display:none; padding:0 16px 24px; }
-.admin-card { background:#fff; border-radius:8px; padding:20px; border:1px solid #ddd; }
-.admin-title { font-size:1rem; font-weight:700; color:#1F3864; margin-bottom:12px; display:flex; justify-content:space-between; }
+.admin-card { background:#fff; border-radius:8px; padding:20px; border:1px solid #ddd; margin:0 16px 24px; }
+.admin-title { font-size:1rem; font-weight:700; color:#1F3864; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; }
 .add-row { display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap; align-items:flex-end; }
 .add-inp { padding:5px 8px; border:1px solid #ccc; border-radius:3px; font-size:0.82rem; font-family:inherit; }
-.add-btn { background:#375623; color:#fff; border:none; padding:6px 14px; border-radius:3px; cursor:pointer; font-size:0.82rem; font-weight:700; font-family:inherit; }
 .emp-table { width:100%; border-collapse:collapse; font-size:12px; }
 .emp-table th { background:#1F3864; color:#fff; padding:6px 10px; text-align:left; }
-.emp-table td { padding:5px 10px; border-bottom:1px solid #eee; }
-.act-btn { border:none; padding:3px 8px; border-radius:3px; cursor:pointer; font-size:0.72rem; font-family:inherit; margin-right:3px; color:#fff; }
-.act-btn.blue { background:#1F3864; }
-.act-btn.red { background:#7f1d1d; }
-.act-btn.orange { background:#9C5700; }
+.emp-table td { padding:5px 10px; border-bottom:1px solid #eee; vertical-align:middle; }
+.act-btn { border:none; padding:3px 8px; border-radius:3px; cursor:pointer; font-size:0.72rem; font-family:inherit; color:#fff; margin-right:3px; }
 </style>
 </head>
 <body>
@@ -95,17 +83,20 @@ body { font-family: Calibri, Arial, sans-serif; background: #f0f0f0; font-size: 
     <div class="login-title">Neato Warehouse</div>
     <div class="login-sub">Employee Schedule Portal</div>
     <label class="lbl">Email Address</label>
-    <input class="inp" type="email" id="loginEmail" placeholder="your@email.com">
+    <input class="inp" type="email" id="loginEmail" placeholder="your@email.com"
+      onkeydown="if(event.key==='Enter') document.getElementById('loginPin').focus()">
     <label class="lbl">4-Digit PIN</label>
-    <input class="inp" type="password" id="loginPin" placeholder="Enter PIN" maxlength="4" inputmode="numeric">
-    <button class="btn" id="loginBtn">View My Schedule</button>
+    <input class="inp" type="password" id="loginPin" placeholder="Enter PIN"
+      maxlength="4" inputmode="numeric"
+      onkeydown="if(event.key==='Enter') doLogin()">
+    <button class="btn" onclick="doLogin()">View My Schedule</button>
     <div class="err" id="loginErr"></div>
     <div class="hint">First time? Use PIN: <strong>1234</strong></div>
   </div>
 </div>
 
 <!-- CHANGE PIN -->
-<div id="changePinScreen" style="display:none;align-items:center;justify-content:center;min-height:100vh;background:#1F3864;">
+<div id="changePinScreen" style="display:none; align-items:center; justify-content:center; min-height:100vh; background:#1F3864;">
   <div class="login-card">
     <div class="login-logo">🔒</div>
     <div class="login-title">Set Your PIN</div>
@@ -113,42 +104,54 @@ body { font-family: Calibri, Arial, sans-serif; background: #f0f0f0; font-size: 
     <label class="lbl">New PIN</label>
     <input class="inp" type="password" id="newPin" placeholder="New 4-digit PIN" maxlength="4" inputmode="numeric">
     <label class="lbl">Confirm PIN</label>
-    <input class="inp" type="password" id="confirmPin" placeholder="Confirm PIN" maxlength="4" inputmode="numeric">
-    <button class="btn" id="savePinBtn">Save PIN & Continue</button>
+    <input class="inp" type="password" id="confirmPin" placeholder="Confirm PIN" maxlength="4" inputmode="numeric"
+      onkeydown="if(event.key==='Enter') saveNewPin()">
+    <button class="btn" onclick="saveNewPin()">Save PIN & Continue</button>
     <div class="err" id="cpErr"></div>
   </div>
 </div>
 
 <!-- APP -->
-<div id="appScreen">
+<div id="appScreen" style="display:none;">
   <div class="app-header">
     <div>
       <h1>🏭 Neato Warehouse Schedule</h1>
       <div class="app-sub" id="appSub"></div>
     </div>
-    <div class="hdr-btns">
-      <button class="hdr-btn" id="changePinBtn">Change PIN</button>
-      <button class="hdr-btn" id="logoutBtn">Sign Out</button>
+    <div>
+      <button class="hdr-btn" onclick="showChangePin('change')">Change PIN</button>
+      <button class="hdr-btn" onclick="doLogout()">Sign Out</button>
     </div>
   </div>
-  <div class="toolbar" id="adminToolbar" style="display:none;">
-    <label class="upload-lbl">
+
+  <!-- Admin toolbar -->
+  <div id="adminToolbar" style="display:none;" class="toolbar">
+    <label class="upload-lbl" style="background:#1F3864;">
       📂 Upload Schedule
-      <input type="file" id="fileInput" accept=".xlsx">
+      <input type="file" id="fileInput" accept=".xlsx" onchange="handleScheduleUpload(event)">
     </label>
-    <label class="upload-lbl green">
+    <label class="upload-lbl" style="background:#375623;">
       👥 Upload Employee List
-      <input type="file" id="empFileInput" accept=".csv,.xlsx">
+      <input type="file" id="empFileInput" accept=".csv,.xlsx" onchange="handleEmpUpload(event)">
     </label>
-    <button class="upload-lbl" style="background:#8496B0;" id="manageBtn" onclick="toggleAdminPanel()">⚙ Manage Employees</button>
+    <button class="tbtn" style="background:#8496B0;" onclick="toggleAdminPanel()">⚙ Manage Employees</button>
     <span id="uploadStatus" style="font-size:0.75rem;color:#375623;"></span>
   </div>
+
+  <!-- Week tabs -->
   <div class="tab-bar" id="tabBar"></div>
+
+  <!-- Search toolbar -->
   <div class="toolbar">
-    <input class="search-box" id="searchInput" placeholder="🔍 Search employee name...">
+    <input class="search-box" id="searchInput" placeholder="🔍 Search employee name..."
+      oninput="filterTable()">
     <span id="myNote" style="font-size:0.78rem;color:#375623;font-weight:700;"></span>
   </div>
+
+  <!-- Schedule -->
   <div class="schedule-wrap" id="schedWrap"></div>
+
+  <!-- Admin panel -->
   <div id="adminPanel" style="display:none;">
     <div class="admin-card">
       <div class="admin-title">
@@ -156,11 +159,15 @@ body { font-family: Calibri, Arial, sans-serif; background: #f0f0f0; font-size: 
         <span id="empCount" style="font-size:0.78rem;color:#888;font-weight:400;"></span>
       </div>
       <div class="add-row">
-        <div><div style="font-size:0.72rem;font-weight:700;margin-bottom:3px;">Email</div>
-          <input class="add-inp" type="email" id="addEmail" placeholder="employee@email.com" style="width:220px;"></div>
-        <div><div style="font-size:0.72rem;font-weight:700;margin-bottom:3px;">Name</div>
-          <input class="add-inp" type="text" id="addName" placeholder="Last, First" style="width:180px;"></div>
-        <button class="add-btn" id="addEmpBtn">+ Add Employee</button>
+        <div>
+          <div style="font-size:0.72rem;font-weight:700;margin-bottom:3px;">Email</div>
+          <input class="add-inp" type="email" id="addEmail" placeholder="employee@email.com" style="width:220px;">
+        </div>
+        <div>
+          <div style="font-size:0.72rem;font-weight:700;margin-bottom:3px;">Name (Last, First)</div>
+          <input class="add-inp" type="text" id="addName" placeholder="Smith, John" style="width:180px;">
+        </div>
+        <button class="tbtn" style="background:#375623;" onclick="addEmployee()">+ Add Employee</button>
         <span id="addErr" style="font-size:0.75rem;color:#c00;"></span>
       </div>
       <table class="emp-table">
@@ -173,99 +180,53 @@ body { font-family: Calibri, Arial, sans-serif; background: #f0f0f0; font-size: 
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
-var SCHEDULES = [{"week_start": "2026-06-15", "days": [{"day": "Sunday", "date": "2026-06-14"}, {"day": "Monday", "date": "2026-06-15"}, {"day": "Tuesday", "date": "2026-06-16"}, {"day": "Wednesday", "date": "2026-06-17"}, {"day": "Thursday", "date": "2026-06-18"}, {"day": "Friday", "date": "2026-06-19"}, {"day": "Saturday", "date": "2026-06-20"}], "employees": [{"name": "Llanes, Yasluvia", "section": "Coordinator", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Link, Michael", "section": "Coordinator", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Sandoval Lunn, Ashley", "section": "Coordinator", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Gamban, Biondee Carlo", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Flores, Maritza", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Herrera, Alexis", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "McAllister, Christopher", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Chavarria, America", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Vanderwal, Brynn", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "OFF", "2026-06-17": "7:00-16:00", "2026-06-18": "OFF", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Lewis, Sa'mauri", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Garner, Avner", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "VanArsdale, Trevor", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Riley, Jayden", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Mikasobe, Louie", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Walters, Roxy", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "On-Call", "2026-06-16": "On-Call", "2026-06-17": "On-Call", "2026-06-18": "On-Call", "2026-06-19": "On-Call", "2026-06-20": "OFF"}}, {"name": "Ware, Jada", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "On-Call", "2026-06-16": "On-Call", "2026-06-17": "On-Call", "2026-06-18": "On-Call", "2026-06-19": "On-Call", "2026-06-20": "OFF"}}, {"name": "Penaloza, Tommy", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "On-Call", "2026-06-17": "On-Call", "2026-06-18": "On-Call", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Davis, Rian", "section": "ICQA", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Padua, Breana", "section": "ICQA", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Rick, Reyes", "section": "Label Room", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Villanueva, Chelsy", "section": "Label Room", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Watkins, Traeveyous", "section": "Inbound/Outbound", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Reams, Cecil", "section": "Inbound/Outbound", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "On-Call", "2026-06-19": "OFF", "2026-06-20": "OFF"}}, {"name": "Luna, Frank", "section": "Inbound/Outbound", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Chea, Kamryn", "section": "Inbound/Outbound", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Quinn, Ravalle", "section": "Inbound/Outbound", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-16:00", "2026-06-20": "OFF"}}]}, {"week_start": "2026-06-22", "days": [{"day": "Sunday", "date": "2026-06-21"}, {"day": "Monday", "date": "2026-06-22"}, {"day": "Tuesday", "date": "2026-06-23"}, {"day": "Wednesday", "date": "2026-06-24"}, {"day": "Thursday", "date": "2026-06-25"}, {"day": "Friday", "date": "2026-06-26"}, {"day": "Saturday", "date": "2026-06-27"}], "employees": [{"name": "Llanes, Yasluvia", "section": "Coordinator", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Link, Michael", "section": "Coordinator", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Sandoval Lunn, Ashley", "section": "Coordinator", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Gamban, Biondee Carlo", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Flores, Maritza", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Herrera, Alexis", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "McAllister, Christopher", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Chavarria, America", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Vanderwal, Brynn", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "OFF", "2026-06-24": "7:00-16:00", "2026-06-25": "OFF", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Lewis, Sa'mauri", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Garner, Avner", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "VanArsdale, Trevor", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Riley, Jayden", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Mikasobe, Louie", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Walters, Roxy", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "On-Call", "2026-06-23": "On-Call", "2026-06-24": "On-Call", "2026-06-25": "On-Call", "2026-06-26": "On-Call", "2026-06-27": "OFF"}}, {"name": "Ware, Jada", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "On-Call", "2026-06-23": "On-Call", "2026-06-24": "On-Call", "2026-06-25": "On-Call", "2026-06-26": "On-Call", "2026-06-27": "OFF"}}, {"name": "Penaloza, Tommy", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "On-Call", "2026-06-23": "On-Call", "2026-06-24": "On-Call", "2026-06-25": "On-Call", "2026-06-26": "On-Call", "2026-06-27": "OFF"}}, {"name": "Davis, Rian", "section": "ICQA", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Padua, Breana", "section": "ICQA", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Rick, Reyes", "section": "Label Room", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Villanueva, Chelsy", "section": "Label Room", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Watkins, Traeveyous", "section": "Inbound/Outbound", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Reams, Cecil", "section": "Inbound/Outbound", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "OFF", "2026-06-26": "OFF", "2026-06-27": "OFF"}}, {"name": "Luna, Frank", "section": "Inbound/Outbound", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Chea, Kamryn", "section": "Inbound/Outbound", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Quinn, Ravalle", "section": "Inbound/Outbound", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-16:00", "2026-06-27": "OFF"}}]}];
-var schedules = SCHEDULES;
-var activeIdx = 0;
-var currentUser = null;
-
-// Default employees — pre-loaded on first visit
+var SCHEDULES     = [{"week_start": "2026-06-15", "days": [{"day": "Sunday", "date": "2026-06-14"}, {"day": "Monday", "date": "2026-06-15"}, {"day": "Tuesday", "date": "2026-06-16"}, {"day": "Wednesday", "date": "2026-06-17"}, {"day": "Thursday", "date": "2026-06-18"}, {"day": "Friday", "date": "2026-06-19"}, {"day": "Saturday", "date": "2026-06-20"}], "employees": [{"name": "Llanes, Yasluvia", "section": "Coordinator", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Link, Michael", "section": "Coordinator", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Sandoval Lunn, Ashley", "section": "Coordinator", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Gamban, Biondee Carlo", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Flores, Maritza", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Herrera, Alexis", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "McAllister, Christopher", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Chavarria, America", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Vanderwal, Brynn", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "OFF", "2026-06-17": "7:00-16:00", "2026-06-18": "OFF", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Lewis, Sa'mauri", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Garner, Avner", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "VanArsdale, Trevor", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Riley, Jayden", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Mikasobe, Louie", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Walters, Roxy", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "On-Call", "2026-06-16": "On-Call", "2026-06-17": "On-Call", "2026-06-18": "On-Call", "2026-06-19": "On-Call", "2026-06-20": "OFF"}}, {"name": "Ware, Jada", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "On-Call", "2026-06-16": "On-Call", "2026-06-17": "On-Call", "2026-06-18": "On-Call", "2026-06-19": "On-Call", "2026-06-20": "OFF"}}, {"name": "Penaloza, Tommy", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "On-Call", "2026-06-17": "On-Call", "2026-06-18": "On-Call", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Davis, Rian", "section": "ICQA", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Padua, Breana", "section": "ICQA", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Rick, Reyes", "section": "Label Room", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Villanueva, Chelsy", "section": "Label Room", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Watkins, Traeveyous", "section": "Inbound/Outbound", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Reams, Cecil", "section": "Inbound/Outbound", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "On-Call", "2026-06-19": "OFF", "2026-06-20": "OFF"}}, {"name": "Luna, Frank", "section": "Inbound/Outbound", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Chea, Kamryn", "section": "Inbound/Outbound", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Quinn, Ravalle", "section": "Inbound/Outbound", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-16:00", "2026-06-20": "OFF"}}]}, {"week_start": "2026-06-22", "days": [{"day": "Sunday", "date": "2026-06-21"}, {"day": "Monday", "date": "2026-06-22"}, {"day": "Tuesday", "date": "2026-06-23"}, {"day": "Wednesday", "date": "2026-06-24"}, {"day": "Thursday", "date": "2026-06-25"}, {"day": "Friday", "date": "2026-06-26"}, {"day": "Saturday", "date": "2026-06-27"}], "employees": [{"name": "Llanes, Yasluvia", "section": "Coordinator", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Link, Michael", "section": "Coordinator", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Sandoval Lunn, Ashley", "section": "Coordinator", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Gamban, Biondee Carlo", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Flores, Maritza", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Herrera, Alexis", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "McAllister, Christopher", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Chavarria, America", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Vanderwal, Brynn", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "OFF", "2026-06-24": "7:00-16:00", "2026-06-25": "OFF", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Lewis, Sa'mauri", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Garner, Avner", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "VanArsdale, Trevor", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Riley, Jayden", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Mikasobe, Louie", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Walters, Roxy", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "On-Call", "2026-06-23": "On-Call", "2026-06-24": "On-Call", "2026-06-25": "On-Call", "2026-06-26": "On-Call", "2026-06-27": "OFF"}}, {"name": "Ware, Jada", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "On-Call", "2026-06-23": "On-Call", "2026-06-24": "On-Call", "2026-06-25": "On-Call", "2026-06-26": "On-Call", "2026-06-27": "OFF"}}, {"name": "Penaloza, Tommy", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "On-Call", "2026-06-23": "On-Call", "2026-06-24": "On-Call", "2026-06-25": "On-Call", "2026-06-26": "On-Call", "2026-06-27": "OFF"}}, {"name": "Davis, Rian", "section": "ICQA", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Padua, Breana", "section": "ICQA", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Rick, Reyes", "section": "Label Room", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Villanueva, Chelsy", "section": "Label Room", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Watkins, Traeveyous", "section": "Inbound/Outbound", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Reams, Cecil", "section": "Inbound/Outbound", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "OFF", "2026-06-26": "OFF", "2026-06-27": "OFF"}}, {"name": "Luna, Frank", "section": "Inbound/Outbound", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Chea, Kamryn", "section": "Inbound/Outbound", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Quinn, Ravalle", "section": "Inbound/Outbound", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-16:00", "2026-06-27": "OFF"}}]}];
 var DEFAULT_USERS = {"cabrerayasluvia@gmail.com": {"name": "Llanes, Yasluvia", "pin": "1234"}, "mikecv1113@gmail.com": {"name": "Link, Michael", "pin": "1234"}, "sandovalashley1999@gmail.com": {"name": "Sandoval Lunn, Ashley", "pin": "1234"}, "gorgebioncarlo1992@gmail.com": {"name": "Gamban, Biondee Carlo", "pin": "1234"}, "maritza.flores@neato.com": {"name": "Flores, Maritza", "pin": "1234"}, "alexherrera420420@outlook.com": {"name": "Herrera, Alexis", "pin": "1234"}, "krizomcallister@gmail.com": {"name": "McAllister, Christopher", "pin": "1234"}, "america.chavarria@yahoo.com": {"name": "Chavarria, America", "pin": "1234"}, "brynnvw44@gmail.com": {"name": "Vanderwal, Brynn", "pin": "1234"}, "samauril702@gmail.com": {"name": "Lewis, Sa'mauri", "pin": "1234"}, "avnervega@gmail.com": {"name": "Garner, Avner", "pin": "1234"}, "trevor.ex7@gmail.com": {"name": "VanArsdale, Trevor", "pin": "1234"}, "jaydenriley1132@gmail.com": {"name": "Riley, Jayden", "pin": "1234"}, "mikster8081@outlook.com": {"name": "Mikasobe, Louie", "pin": "1234"}, "roxywaltersjobs@gmail.com": {"name": "Walters, Roxy", "pin": "1234"}, "jadaware1@gmail.com": {"name": "Ware, Jada", "pin": "1234"}, "tommypenaloza896@gmail.com": {"name": "Penaloza, Tommy", "pin": "1234"}, "riandgirldad03@icloud.com": {"name": "Davis, Rian", "pin": "1234"}, "breana.padua20@gmail.com": {"name": "Padua, Breana", "pin": "1234"}, "reyesrick06@gmail.com": {"name": "Rick, Reyes", "pin": "1234"}, "chelsyxvilla@gmail.com": {"name": "Villanueva, Chelsy", "pin": "1234"}, "traeveyouswatkins1994@gmail.com": {"name": "Watkins, Traeveyous", "pin": "1234"}, "cecilreams@outlook.com": {"name": "Reams, Cecil", "pin": "1234"}, "epmoon88@gmail.com": {"name": "Luna, Frank", "pin": "1234"}, "kamrynchea2020@gmail.com": {"name": "Chea, Kamryn", "pin": "1234"}, "quinnravalle@gmail.com": {"name": "Quinn, Ravalle", "pin": "1234"}};
+var schedules     = SCHEDULES;
+var currentUser   = null;
 
-// Storage
+// ── Storage ─────────────────────────────────────
 function getUsers() {
   try {
     var stored = JSON.parse(localStorage.getItem('neato_users') || '{}');
-    // Merge defaults with any locally stored users (stored takes priority)
-    var merged = Object.assign({}, DEFAULT_USERS, stored);
-    return merged;
+    return Object.assign({}, DEFAULT_USERS, stored);
   } catch(e) { return DEFAULT_USERS; }
 }
-function saveUsers(u) { localStorage.setItem('neato_users', JSON.stringify(u)); }
-
-// ── Global functions for inline onclick ────────
-function toggleAdminPanel() {
-  var p = document.getElementById('adminPanel');
-  p.style.display = p.style.display === 'none' ? 'block' : 'none';
-  if (p.style.display === 'block') renderAdminPanel();
+function saveUsers(u) {
+  // Only save overrides (PIN changes, additions, removals)
+  localStorage.setItem('neato_users', JSON.stringify(u));
 }
 
-// ── Wire up all buttons on DOMContentLoaded ────
-document.addEventListener('DOMContentLoaded', function() {
-
-  // Login button
-  document.getElementById('loginBtn').addEventListener('click', doLogin);
-  document.getElementById('loginPin').addEventListener('keydown', function(e) { if(e.key==='Enter') doLogin(); });
-  document.getElementById('loginEmail').addEventListener('keydown', function(e) { if(e.key==='Enter') document.getElementById('loginPin').focus(); });
-
-  // Save PIN button
-  document.getElementById('savePinBtn').addEventListener('click', saveNewPin);
-  document.getElementById('confirmPin').addEventListener('keydown', function(e) { if(e.key==='Enter') saveNewPin(); });
-
-  // Logout
-  document.getElementById('logoutBtn').addEventListener('click', doLogout);
-
-  // Change PIN
-  document.getElementById('changePinBtn').addEventListener('click', function() {
-    document.getElementById('appScreen').style.display = 'none';
-    document.getElementById('changePinScreen').style.display = 'flex';
-    document.getElementById('cpSub').textContent = 'Choose a new 4-digit PIN.';
-    document.getElementById('newPin').value = '';
-    document.getElementById('confirmPin').value = '';
-    document.getElementById('cpErr').textContent = '';
-  });
-
-  // Search
-  document.getElementById('searchInput').addEventListener('input', filterTable);
-
-  // Add employee
-  document.getElementById('addEmpBtn').addEventListener('click', addEmployee);
-
-  // File uploads
-  document.getElementById('fileInput').addEventListener('change', handleScheduleUpload);
-  document.getElementById('empFileInput').addEventListener('change', handleEmpUpload);
-});
-
-// ── Login ──────────────────────────────────────
+// ── Login ────────────────────────────────────────
 function doLogin() {
-  var email = document.getElementById('loginEmail').value.trim().toLowerCase();
-  var pin   = document.getElementById('loginPin').value.trim();
+  var email = (document.getElementById('loginEmail').value || '').trim().toLowerCase();
+  var pin   = (document.getElementById('loginPin').value || '').trim();
   var err   = document.getElementById('loginErr');
   err.textContent = '';
 
-  if (!email) { err.textContent = 'Enter your email address.'; return; }
-  if (!pin || pin.length !== 4) { err.textContent = 'Enter your 4-digit PIN.'; return; }
+  if (!email) { err.textContent = 'Please enter your email address.'; return; }
+  if (!pin || pin.length < 4) { err.textContent = 'Please enter your 4-digit PIN.'; return; }
 
-  // Admin accounts
+  // Admin check
   var admins = {
-    'mike.norrby@neato.com':    { name: 'Mike Norrby',     pin: '0000' },
+    'mike.norrby@neato.com':     { name: 'Mike Norrby',     pin: '0000' },
     'alison.ratering@neato.com': { name: 'Alison Ratering', pin: '0000' },
-    'shane.odell@neato.com':     { name: "Shane O'Dell",   pin: '0000' }
+    'shane.odell@neato.com':     { name: "Shane O'Dell",    pin: '0000' }
   };
-  if (admins[email] && admins[email].pin === pin) {
+  if (admins[email]) {
+    if (admins[email].pin !== pin) { err.textContent = 'Incorrect PIN.'; return; }
     currentUser = { email: email, name: admins[email].name, isAdmin: true };
     enterApp(); return;
   }
 
+  // Employee check
   var users = getUsers();
   if (!users[email]) { err.textContent = 'Email not found. Contact your manager.'; return; }
-
   var u = users[email];
-  if (pin === '1234' && u.pin === '1234') {
+
+  if (pin === '1234' && (u.pin === '1234' || !u.pin)) {
     currentUser = { email: email, name: u.name, isAdmin: false };
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('changePinScreen').style.display = 'flex';
-    document.getElementById('cpSub').textContent = 'Welcome! Please set a personal PIN.';
-    return;
+    showChangePin('first'); return;
   }
   if (u.pin !== pin) { err.textContent = 'Incorrect PIN. First time? Use PIN: 1234'; return; }
 
@@ -273,44 +234,65 @@ function doLogin() {
   enterApp();
 }
 
-// ── Save PIN ───────────────────────────────────
+// ── Change PIN ───────────────────────────────────
+function showChangePin(mode) {
+  document.getElementById('loginScreen').style.display    = 'none';
+  document.getElementById('appScreen').style.display      = 'none';
+  document.getElementById('changePinScreen').style.display = 'flex';
+  document.getElementById('cpSub').textContent = mode === 'first'
+    ? 'Welcome! Please set a personal PIN to secure your account.'
+    : 'Choose a new 4-digit PIN.';
+  document.getElementById('newPin').value = '';
+  document.getElementById('confirmPin').value = '';
+  document.getElementById('cpErr').textContent = '';
+}
+
 function saveNewPin() {
-  var np  = document.getElementById('newPin').value.trim();
-  var cp  = document.getElementById('confirmPin').value.trim();
+  var np  = (document.getElementById('newPin').value || '').trim();
+  var cp  = (document.getElementById('confirmPin').value || '').trim();
   var err = document.getElementById('cpErr');
   err.textContent = '';
-  if (!np || np.length !== 4 || !/^[0-9]{4}$/.test(np)) { err.textContent = 'PIN must be 4 numbers.'; return; }
-  if (np !== cp) { err.textContent = 'PINs do not match.'; return; }
-  if (np === '1234') { err.textContent = 'Choose a different PIN.'; return; }
+  if (!np || np.length !== 4 || !/^[0-9]{4}$/.test(np)) { err.textContent = 'PIN must be exactly 4 digits.'; return; }
+  if (np !== cp)   { err.textContent = 'PINs do not match.'; return; }
+  if (np === '1234') { err.textContent = 'Please choose a different PIN.'; return; }
   var users = getUsers();
   if (users[currentUser.email]) { users[currentUser.email].pin = np; saveUsers(users); }
   document.getElementById('changePinScreen').style.display = 'none';
   enterApp();
 }
 
-// ── Enter app ──────────────────────────────────
+// ── Enter app ────────────────────────────────────
 function enterApp() {
-  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('loginScreen').style.display     = 'none';
   document.getElementById('changePinScreen').style.display = 'none';
-  document.getElementById('appScreen').style.display = 'block';
-  document.getElementById('appSub').textContent = 'Welcome, ' + currentUser.name;
-  if (currentUser.isAdmin) document.getElementById('adminToolbar').style.display = 'flex';
+  document.getElementById('appScreen').style.display       = 'block';
+  document.getElementById('appSub').textContent            = 'Welcome, ' + currentUser.name;
+  if (currentUser.isAdmin) {
+    document.getElementById('adminToolbar').style.display = 'flex';
+  }
   buildTabs();
 }
 
-// ── Logout ─────────────────────────────────────
+// ── Logout ───────────────────────────────────────
 function doLogout() {
   currentUser = null;
-  document.getElementById('appScreen').style.display = 'none';
-  document.getElementById('adminToolbar').style.display = 'none';
-  document.getElementById('adminPanel').style.display = 'none';
-  document.getElementById('loginScreen').style.display = 'flex';
-  document.getElementById('loginEmail').value = '';
-  document.getElementById('loginPin').value = '';
-  document.getElementById('loginErr').textContent = '';
+  document.getElementById('appScreen').style.display       = 'none';
+  document.getElementById('adminToolbar').style.display    = 'none';
+  document.getElementById('adminPanel').style.display      = 'none';
+  document.getElementById('loginScreen').style.display     = 'flex';
+  document.getElementById('loginEmail').value              = '';
+  document.getElementById('loginPin').value                = '';
+  document.getElementById('loginErr').textContent          = '';
 }
 
-// ── Build tabs ─────────────────────────────────
+// ── Admin panel toggle ───────────────────────────
+function toggleAdminPanel() {
+  var p = document.getElementById('adminPanel');
+  p.style.display = (p.style.display === 'none' || p.style.display === '') ? 'block' : 'none';
+  if (p.style.display === 'block') renderAdminPanel();
+}
+
+// ── Build tabs ───────────────────────────────────
 function buildTabs() {
   var today = new Date().toISOString().split('T')[0];
   var auto  = 0;
@@ -318,28 +300,22 @@ function buildTabs() {
   schedules.forEach(function(s, i) {
     var ws = new Date(s.week_start + 'T12:00:00');
     var we = new Date(ws); we.setDate(we.getDate() + 6);
+    var weStr = we.toISOString().split('T')[0];
     var lbl = (ws.getMonth()+1)+'/'+ws.getDate()+' – '+(we.getMonth()+1)+'/'+we.getDate()+'/'+String(we.getFullYear()).slice(2);
     var badge = '';
-    var weStr = we.toISOString().split('T')[0];
     if (today >= s.week_start && today <= weStr) { badge = '<span class="badge">CURRENT</span>'; auto = i; }
     else if (i > 0 && today > schedules[i-1].week_start) { badge = '<span class="badge" style="background:#9C5700">NEXT</span>'; }
-    html += '<button class="tab-btn" data-idx="'+i+'">'+lbl+badge+'</button>';
+    html += '<button class="tab-btn" onclick="renderSchedule(' + i + ')">' + lbl + badge + '</button>';
   });
-  var tabBar = document.getElementById('tabBar');
-  tabBar.innerHTML = html;
-  tabBar.querySelectorAll('.tab-btn').forEach(function(btn) {
-    btn.addEventListener('click', function() { renderSchedule(parseInt(this.dataset.idx)); });
-  });
+  document.getElementById('tabBar').innerHTML = html;
   renderSchedule(auto);
 }
 
-// ── Render schedule ────────────────────────────
+// ── Render schedule ──────────────────────────────
 function renderSchedule(idx) {
-  activeIdx = idx;
   var sched = schedules[idx];
   if (!sched) return;
-  document.querySelectorAll('.tab-btn').forEach(function(t) { t.classList.toggle('active', parseInt(t.dataset.idx) === idx); });
-
+  document.querySelectorAll('.tab-btn').forEach(function(t, i) { t.classList.toggle('active', i === idx); });
   var today = new Date().toISOString().split('T')[0];
   var sections = {}, order = [];
   sched.employees.forEach(function(e) {
@@ -347,7 +323,6 @@ function renderSchedule(idx) {
     if (!sections[s]) { sections[s] = []; order.push(s); }
     sections[s].push(e);
   });
-
   var html = '<table class="sched-table"><thead>';
   html += '<tr class="row-days"><th>Employee</th>';
   sched.days.forEach(function(d) { html += '<th class="'+(d.date===today?'tday':'')+'">'+d.day+'</th>'; });
@@ -357,7 +332,6 @@ function renderSchedule(idx) {
     html += '<td class="'+(d.date===today?'tday':'')+'">'+lbl+(d.date===today?' ★':'')+'</td>';
   });
   html += '</tr></thead><tbody>';
-
   order.forEach(function(sec) {
     html += '<tr class="row-section"><td colspan="'+(sched.days.length+1)+'">'+sec+'</td></tr>';
     sections[sec].forEach(function(emp) {
@@ -368,10 +342,10 @@ function renderSchedule(idx) {
         var u = v.toLowerCase();
         var cls = d.date === today ? 'tday-cell ' : '';
         if (u === 'off') cls += 'off';
-        else if (u === 'on-call') cls += 'oncall';
+        else if (u === 'on-call') { cls += 'oncall'; v = 'On-Call'; }
         else if (u === 'pto') cls += 'pto';
         else cls += 'hours';
-        html += '<td class="'+cls.trim()+'">'+(u==='on-call'?'On-Call':v)+'</td>';
+        html += '<td class="'+cls.trim()+'">'+v+'</td>';
       });
       html += '</tr>';
     });
@@ -382,75 +356,56 @@ function renderSchedule(idx) {
   highlightMyRow();
 }
 
-// ── Highlight my row ───────────────────────────
+// ── Highlight my row ─────────────────────────────
 function highlightMyRow() {
   if (!currentUser) return;
   var users = getUsers();
   var u = users[currentUser.email];
   if (!u) return;
   var n = u.name.toLowerCase();
+  var first = n.split(',')[0].trim();
   document.querySelectorAll('.row-emp').forEach(function(r) {
     var rn = r.dataset.name || '';
-    r.classList.toggle('myrow', rn === n || rn.includes(n.split(',')[0].trim()) || n.includes(rn.split(',')[0].trim()));
+    r.classList.toggle('myrow', rn === n || rn.includes(first));
   });
-  var note = document.getElementById('myNote');
-  if (note) note.textContent = '★ Your schedule is highlighted';
+  document.getElementById('myNote').textContent = '★ Your schedule is highlighted';
 }
 
-// ── Filter ─────────────────────────────────────
+// ── Filter ────────────────────────────────────────
 function filterTable() {
-  var q = document.getElementById('searchInput').value.toLowerCase().trim();
+  var q = (document.getElementById('searchInput').value || '').toLowerCase().trim();
   document.querySelectorAll('.row-emp').forEach(function(r) {
     r.classList.toggle('hidden', !!q && !(r.dataset.name||'').includes(q));
   });
 }
 
-// ── Admin: render panel ────────────────────────
+// ── Admin: render panel ──────────────────────────
 function renderAdminPanel() {
   var users = getUsers();
-  var keys  = Object.keys(users);
-  document.getElementById('empCount').textContent = keys.length + ' employee' + (keys.length!==1?'s':'');
+  var keys  = Object.keys(users).sort();
+  document.getElementById('empCount').textContent = keys.length + ' employees';
   var html = '';
-  keys.sort().forEach(function(email) {
+  keys.forEach(function(email) {
     var u = users[email];
-    var pinSt = u.pin==='1234'
-      ? '<span style="color:#c00;font-weight:700;">Default</span>'
+    var pinSt = (!u.pin || u.pin === '1234')
+      ? '<span style="color:#c00;font-weight:700;">Default (1234)</span>'
       : '<span style="color:#375623;font-weight:700;">Set ✓</span>';
     html += '<tr>' +
       '<td>'+email+'</td><td>'+u.name+'</td><td>'+pinSt+'</td>' +
       '<td>' +
-        '<button class="act-btn blue" data-action="edit" data-email="'+email+'">Edit</button>' +
-        '<button class="act-btn orange" data-action="reset" data-email="'+email+'">Reset PIN</button>' +
-        '<button class="act-btn red" data-action="remove" data-email="'+email+'">Remove</button>' +
+        '<button class="act-btn" style="background:#1F3864;" onclick="editEmployee(''+email.replace(/'/g,"\'")+'')" >Edit</button>' +
+        '<button class="act-btn" style="background:#9C5700;" onclick="resetPin(''+email.replace(/'/g,"\'")+'')">Reset PIN</button>' +
+        '<button class="act-btn" style="background:#7f1d1d;" onclick="removeEmployee(''+email.replace(/'/g,"\'")+'')">Remove</button>' +
       '</td></tr>';
   });
-  var tbody = document.getElementById('empBody');
-  tbody.innerHTML = html || '<tr><td colspan="4" style="text-align:center;color:#888;padding:12px;">No employees yet.</td></tr>';
-  tbody.querySelectorAll('.act-btn').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      var action = this.dataset.action;
-      var email  = this.dataset.email;
-      var users2 = getUsers();
-      if (action === 'remove') {
-        if (!confirm('Remove access for '+email+'?')) return;
-        delete users2[email]; saveUsers(users2);
-      } else if (action === 'reset') {
-        if (!confirm('Reset PIN for '+email+' to 1234?')) return;
-        users2[email].pin = '1234'; saveUsers(users2);
-      } else if (action === 'edit') {
-        var newName = prompt('Edit name for '+email+':', users2[email].name);
-        if (!newName || !newName.trim()) return;
-        users2[email].name = newName.trim(); saveUsers(users2);
-      }
-      renderAdminPanel();
-    });
-  });
+  document.getElementById('empBody').innerHTML = html ||
+    '<tr><td colspan="4" style="text-align:center;color:#888;padding:12px;">No employees yet.</td></tr>';
 }
 
-// ── Add employee ───────────────────────────────
+// ── Admin actions ────────────────────────────────
 function addEmployee() {
-  var email = document.getElementById('addEmail').value.trim().toLowerCase();
-  var name  = document.getElementById('addName').value.trim();
+  var email = (document.getElementById('addEmail').value || '').trim().toLowerCase();
+  var name  = (document.getElementById('addName').value || '').trim();
   var err   = document.getElementById('addErr');
   err.textContent = '';
   if (!email || !email.includes('@')) { err.textContent = 'Enter a valid email.'; return; }
@@ -460,12 +415,36 @@ function addEmployee() {
   users[email] = { name: name, pin: '1234' };
   saveUsers(users);
   document.getElementById('addEmail').value = '';
-  document.getElementById('addName').value = '';
-  document.getElementById('uploadStatus').textContent = '✓ Added '+name+' — default PIN: 1234';
+  document.getElementById('addName').value  = '';
+  document.getElementById('uploadStatus').textContent = '✓ Added ' + name + ' — default PIN: 1234';
   renderAdminPanel();
 }
 
-// ── Upload employee list ───────────────────────
+function editEmployee(email) {
+  var users = getUsers();
+  if (!users[email]) return;
+  var newName = prompt('Edit name for ' + email + ':', users[email].name);
+  if (!newName || !newName.trim()) return;
+  users[email].name = newName.trim();
+  saveUsers(users);
+  renderAdminPanel();
+}
+
+function resetPin(email) {
+  if (!confirm('Reset PIN for ' + email + ' to 1234?')) return;
+  var users = getUsers();
+  if (users[email]) { users[email].pin = '1234'; saveUsers(users); renderAdminPanel(); }
+}
+
+function removeEmployee(email) {
+  if (!confirm('Remove access for ' + email + '?')) return;
+  var users = getUsers();
+  delete users[email];
+  saveUsers(users);
+  renderAdminPanel();
+}
+
+// ── Upload employee list ─────────────────────────
 function handleEmpUpload(evt) {
   var file = evt.target.files[0];
   if (!file) return;
@@ -475,67 +454,66 @@ function handleEmpUpload(evt) {
       var users = getUsers();
       var added = 0;
       if (file.name.endsWith('.csv')) {
-        e.target.result.split('\n').forEach(function(line) {
+        (e.target.result || '').split('\n').forEach(function(line) {
           var p = line.split(',');
           var em = (p[0]||'').trim().toLowerCase();
           var nm = (p[1]||'').trim();
           if (em && em.includes('@') && !users[em]) { users[em]={name:nm,pin:'1234'}; added++; }
         });
       } else {
-        var wb = XLSX.read(e.target.result, {type:'binary'});
-        XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header:1}).forEach(function(row) {
+        var wb2 = XLSX.read(e.target.result, {type:'binary'});
+        XLSX.utils.sheet_to_json(wb2.Sheets[wb2.SheetNames[0]], {header:1}).forEach(function(row) {
           var em = String(row[0]||'').trim().toLowerCase();
           var nm = String(row[1]||'').trim();
           if (em && em.includes('@') && !users[em]) { users[em]={name:nm,pin:'1234'}; added++; }
         });
       }
       saveUsers(users);
-      document.getElementById('uploadStatus').textContent = '✓ '+added+' employees added';
+      document.getElementById('uploadStatus').textContent = '✓ ' + added + ' employees added';
       renderAdminPanel();
-    } catch(err) { document.getElementById('uploadStatus').textContent = '✗ '+err.message; }
+    } catch(err2) { document.getElementById('uploadStatus').textContent = '✗ ' + err2.message; }
   };
   if (file.name.endsWith('.csv')) reader.readAsText(file);
   else reader.readAsBinaryString(file);
 }
 
-// ── Upload schedule ────────────────────────────
+// ── Upload schedule ──────────────────────────────
 function handleScheduleUpload(evt) {
   var file = evt.target.files[0];
   if (!file) return;
   var reader = new FileReader();
   reader.onload = function(e) {
     try {
-      var wb = XLSX.read(e.target.result, {type:'binary',cellDates:true});
-      var ws = wb.Sheets[wb.SheetNames[0]];
+      var wb2 = XLSX.read(e.target.result, {type:'binary',cellDates:true});
+      var ws2 = wb2.Sheets[wb2.SheetNames[0]];
       var SKW = ['deliveries','coordinator','production','icqa','label room','inbound','outbound','training'];
       var cfgs = [{nc:0,ds:1},{nc:9,ds:10}];
       var result = [];
       cfgs.forEach(function(cfg) {
-        var days=[], emps=[], sec='', maxR=0;
-        Object.keys(ws).forEach(function(k){ if(k[0]!=='!'){var r=XLSX.utils.decode_cell(k);if(r.r>maxR)maxR=r.r;} });
+        var days=[], emps=[], sec='', maxR=0, seen={};
+        Object.keys(ws2).forEach(function(k){ if(k[0]!=='!'){var r=XLSX.utils.decode_cell(k);if(r.r>maxR)maxR=r.r;} });
         for (var c=cfg.ds;c<cfg.ds+7;c++) {
-          var dc=XLSX.utils.encode_cell({r:0,c:c}), dtc=XLSX.utils.encode_cell({r:1,c:c});
-          var dn=ws[dc]?String(ws[dc].v||'').trim():['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][c-cfg.ds];
-          var dv=ws[dtc]?ws[dtc].v:null, ds2='';
-          if (dv instanceof Date) ds2=dv.toISOString().split('T')[0];
-          else if (typeof dv==='number'){var dd=new Date(Math.round((dv-25569)*86400*1000));ds2=dd.toISOString().split('T')[0];}
-          days.push({day:dn,date:ds2});
+          var dc2=XLSX.utils.encode_cell({r:0,c:c}), dtc2=XLSX.utils.encode_cell({r:1,c:c});
+          var dn2=ws2[dc2]?String(ws2[dc2].v||'').trim():['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][c-cfg.ds];
+          var dv2=ws2[dtc2]?ws2[dtc2].v:null, ds3='';
+          if (dv2 instanceof Date) ds3=dv2.toISOString().split('T')[0];
+          else if (typeof dv2==='number'){var dd2=new Date(Math.round((dv2-25569)*86400*1000));ds3=dd2.toISOString().split('T')[0];}
+          days.push({day:dn2,date:ds3});
         }
-        var seenNames={};
-        for (var r=2;r<=maxR;r++) {
-          var nc2=XLSX.utils.encode_cell({r:r,c:cfg.nc});
-          if (!ws[nc2]) continue;
-          var nm=String(ws[nc2].v||'').trim();
-          if (!nm) continue;
+        for (var r2=2;r2<=maxR;r2++) {
+          var nc2=XLSX.utils.encode_cell({r:r2,c:cfg.nc});
+          if (!ws2[nc2]) continue;
+          var nm2=String(ws2[nc2].v||'').trim();
+          if (!nm2) continue;
           var svs=[];
-          for (var ci=cfg.ds;ci<cfg.ds+7;ci++){var sc2=XLSX.utils.encode_cell({r:r,c:ci});svs.push(ws[sc2]?String(ws[sc2].v||'').trim():'');}
-          var ne=svs.filter(function(v){return v&&v!=='`'&&v!=="'";});
-          if (SKW.some(function(k){return nm.toLowerCase().indexOf(k)!==-1;})||ne.length===0){sec=nm;continue;}
-          if (seenNames[nm.toLowerCase()]) continue;
-          seenNames[nm.toLowerCase()]=true;
-          var shifts={};
-          days.forEach(function(d,di){var v=svs[di];shifts[d.date]=v&&v!=='`'&&v!=="'"?v:'OFF';});
-          emps.push({name:nm,section:sec,shifts:shifts});
+          for (var ci2=cfg.ds;ci2<cfg.ds+7;ci2++){var sc2=XLSX.utils.encode_cell({r:r2,c:ci2});svs.push(ws2[sc2]?String(ws2[sc2].v||'').trim():'');}
+          var ne2=svs.filter(function(v){return v&&v!=='`'&&v!=="'";});
+          if (SKW.some(function(k){return nm2.toLowerCase().indexOf(k)!==-1;})||ne2.length===0){sec=nm2;continue;}
+          if (seen[nm2.toLowerCase()]) continue;
+          seen[nm2.toLowerCase()]=true;
+          var shifts2={};
+          days.forEach(function(d2,di2){var v2=svs[di2];shifts2[d2.date]=v2&&v2!=='`'&&v2!=="'"?v2:'OFF';});
+          emps.push({name:nm2,section:sec,shifts:shifts2});
         }
         if (days[1]&&days[1].date) result.push({week_start:days[1].date,days:days,employees:emps});
       });
@@ -543,8 +521,8 @@ function handleScheduleUpload(evt) {
       schedules = result;
       localStorage.setItem('neato_schedules', JSON.stringify(schedules));
       buildTabs();
-      document.getElementById('uploadStatus').textContent = '✓ Schedule updated ('+file.name+')';
-    } catch(err2) { document.getElementById('uploadStatus').textContent = '✗ '+err2.message; }
+      document.getElementById('uploadStatus').textContent = '✓ Schedule updated (' + file.name + ')';
+    } catch(err3) { document.getElementById('uploadStatus').textContent = '✗ ' + err3.message; }
   };
   reader.readAsBinaryString(file);
 }
