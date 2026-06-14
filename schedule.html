@@ -249,7 +249,7 @@ function doLogin() {
   var admins = {
     'mike.norrby@neato.com':    { name: 'Mike Norrby',     pin: '0000' },
     'alison.ratering@neato.com': { name: 'Alison Ratering', pin: '0000' },
-    'shane.odell@neato.com':     { name: 'Shane O'Dell',   pin: '0000' }
+    'shane.odell@neato.com':     { name: "Shane O'Dell",   pin: '0000' }
   };
   if (admins[email] && admins[email].pin === pin) {
     currentUser = { email: email, name: admins[email].name, isAdmin: true };
