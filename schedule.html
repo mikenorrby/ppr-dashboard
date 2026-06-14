@@ -140,7 +140,7 @@ body { font-family: Calibri, Arial, sans-serif; background: #f0f0f0; font-size: 
       👥 Upload Employee List
       <input type="file" id="empFileInput" accept=".csv,.xlsx">
     </label>
-    <button class="upload-lbl" style="background:#8496B0;" id="manageBtn">⚙ Manage Employees</button>
+    <button class="upload-lbl" style="background:#8496B0;" id="manageBtn" onclick="toggleAdminPanel()">⚙ Manage Employees</button>
     <span id="uploadStatus" style="font-size:0.75rem;color:#375623;"></span>
   </div>
   <div class="tab-bar" id="tabBar"></div>
@@ -192,6 +192,13 @@ function getUsers() {
 }
 function saveUsers(u) { localStorage.setItem('neato_users', JSON.stringify(u)); }
 
+// ── Global functions for inline onclick ────────
+function toggleAdminPanel() {
+  var p = document.getElementById('adminPanel');
+  p.style.display = p.style.display === 'none' ? 'block' : 'none';
+  if (p.style.display === 'block') renderAdminPanel();
+}
+
 // ── Wire up all buttons on DOMContentLoaded ────
 document.addEventListener('DOMContentLoaded', function() {
 
@@ -219,13 +226,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Search
   document.getElementById('searchInput').addEventListener('input', filterTable);
-
-  // Manage employees toggle
-  document.getElementById('manageBtn').addEventListener('click', function() {
-    var p = document.getElementById('adminPanel');
-    p.style.display = p.style.display === 'none' ? 'block' : 'none';
-    if (p.style.display === 'block') renderAdminPanel();
-  });
 
   // Add employee
   document.getElementById('addEmpBtn').addEventListener('click', addEmployee);
