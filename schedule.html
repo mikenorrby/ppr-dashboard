@@ -93,14 +93,19 @@ h2{color:#1F3864;margin-bottom:4px;}
     </div>
   </div>
   <div class="adminbar" id="adminBar">
-    <label class="ulbl" style="background:#1F3864;">&#128194; Upload Schedule<input type="file" id="fileInput" accept=".xlsx"></label>
+    <input type="file" id="fileInputCurrent" accept=".xlsx" style="display:none;">
+    <input type="file" id="fileInputNext" accept=".xlsx" style="display:none;">
+    <button class="ulbl" style="background:#1F3864;" onclick="document.getElementById('fileInputCurrent').click()">&#128194; Upload Current Week</button>
+    <button class="ulbl" style="background:#2E75B6;" onclick="document.getElementById('fileInputNext').click()">&#128194; Upload Next Week</button>
     <button class="ulbl" style="background:#8496B0;" id="manageBtn" onclick="toggleAdmin()">&#9881; Manage Employees</button>
+    <button class="ulbl" style="background:#c00;" onclick="testFirebase()">Test Firebase</button>
     <span id="uploadMsg" style="font-size:0.75rem;color:#375623;"></span>
   </div>
   <div class="tabs" id="tabBar"></div>
   <div class="tbar">
     <input class="srch" id="srch" placeholder="Search employee name...">
     <span id="myNote" style="font-size:0.78rem;color:#375623;font-weight:700;"></span>
+    <span id="firebaseNote" style="font-size:0.72rem;color:#888;margin-left:auto;"></span>
   </div>
   <div class="wrap" id="schedWrap"></div>
   <div id="adminPanel" style="display:none;padding:0 16px 24px;">
@@ -121,6 +126,94 @@ h2{color:#1F3864;margin-bottom:4px;}
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script>
+  var firebaseConfig = {
+    apiKey: "AIzaSyD1QTqyxIO9x55SamCOYhBMDE37fSvhz5E",
+    authDomain: "neato-warehouse-ppr.firebaseapp.com",
+    projectId: "neato-warehouse-ppr",
+    storageBucket: "neato-warehouse-ppr.firebasestorage.app",
+    messagingSenderId: "1081562590282",
+    appId: "1:1081562590282:web:0945754ec9620963080ab3"
+  };
+  firebase.initializeApp(firebaseConfig);
+  var db = firebase.firestore();
+
+  // Push schedule to Firebase and update display immediately
+  function pushScheduleToFirebase(scheds) {
+    // Update display right away — don't wait for Firebase
+    window.curScheds = scheds;
+    buildTabs();
+    db.collection("schedule").doc("current").set({
+      data: JSON.stringify(scheds),
+      updated: new Date().toISOString()
+    }).then(function() {
+      document.getElementById("uploadMsg").textContent = "Schedule updated for all employees!";
+    }).catch(function(e) {
+      document.getElementById("uploadMsg").textContent = "Saved locally. Firebase error: " + e.message;
+    });
+  }
+
+  // Load schedule from Firebase — compare timestamps to decide which is newer
+  function loadScheduleFromFirebase() {
+    db.collection("schedule").doc("current").get().then(function(snap) {
+      var note = document.getElementById("firebaseNote");
+      if (snap.exists) {
+        var saved = JSON.parse(snap.data().data);
+        var fbUpdated = snap.data().updated || "";
+        if (saved && saved.length > 0) {
+          // Only use Firebase data if it was updated after the HTML was built
+          // Check by comparing week start dates — use whichever has later data
+          var fbWeek = saved[0] ? saved[0].week_start : "";
+          var embWeek = window.SCHEDS[0] ? window.SCHEDS[0].week_start : "";
+          // Check if Firebase schedule has PTO (indicates it was recently uploaded)
+          var fbPTO = saved.some(function(s){
+            return s.employees&&s.employees.some(function(e){
+              return Object.values(e.shifts||{}).some(function(v){return v==="PTO";});
+            });
+          });
+          var embPTO = window.SCHEDS.some(function(s){
+            return s.employees&&s.employees.some(function(e){
+              return Object.values(e.shifts||{}).some(function(v){return v==="PTO";});
+            });
+          });
+          // Use Firebase only if BOTH conditions: same or newer week AND has PTO (or embedded doesn't)
+          var useFirebase = (fbWeek >= embWeek) && (fbPTO || !embPTO);
+          if (useFirebase) {
+            window.curScheds = saved;
+            buildTabs();
+            if (note) note.textContent = "Live: " + fbUpdated.substring(0,10);
+          } else {
+            if (note) note.textContent = "Using local schedule (newer)";
+          }
+        }
+      } else {
+        if (note) note.textContent = "Using embedded schedule";
+      }
+    }).catch(function(e) {
+      var note = document.getElementById("firebaseNote");
+      if (note) note.textContent = "Firebase offline";
+    });
+  }
+
+  // Test Firebase connection
+  function testFirebase() {
+    document.getElementById("uploadMsg").textContent = "Testing Firebase...";
+    db.collection("schedule").doc("test").set({test: "hello", time: new Date().toISOString()})
+      .then(function() {
+        document.getElementById("uploadMsg").textContent = "Firebase WORKS! Write successful.";
+      })
+      .catch(function(e) {
+        document.getElementById("uploadMsg").textContent = "Firebase FAILED: " + e.message;
+      });
+  }
+
+  // Load when page opens
+  window.addEventListener("load", function() {
+    loadScheduleFromFirebase();
+  });
+</script>
 <script>
 var ADMINS = {
   "mike.norrby@neato.com":     "0000",
@@ -131,7 +224,7 @@ var ADMINS = {
   "ryshaud@neato.com":         "0000"
 };
 var USERS  = {"cabrerayasluvia@gmail.com": "Llanes, Yasluvia", "mikecv1113@gmail.com": "Link, Michael", "sandovalashley1999@gmail.com": "Sandoval Lunn, Ashley", "gorgebioncarlo1992@gmail.com": "Gamban, Biondee Carlo", "maritza.flores@neato.com": "Flores, Maritza", "alexherrera420420@outlook.com": "Herrera, Alexis", "krizomcallister@gmail.com": "McAllister, Christopher", "america.chavarria@yahoo.com": "Chavarria, America", "brynnvw44@gmail.com": "Vanderwal, Brynn", "samauril702@gmail.com": "Lewis, Samauri", "avnervega@gmail.com": "Garner, Avner", "trevor.ex7@gmail.com": "VanArsdale, Trevor", "jaydenriley1132@gmail.com": "Riley, Jayden", "mikster8081@outlook.com": "Mikasobe, Louie", "roxywaltersjobs@gmail.com": "Walters, Roxy", "jadaware1@gmail.com": "Ware, Jada", "tommypenaloza896@gmail.com": "Penaloza, Tommy", "riandgirldad03@icloud.com": "Davis, Rian", "breana.padua20@gmail.com": "Padua, Breana", "reyesrick06@gmail.com": "Rick, Reyes", "chelsyxvilla@gmail.com": "Villanueva, Chelsy", "traeveyouswatkins1994@gmail.com": "Watkins, Traeveyous", "cecilreams@outlook.com": "Reams, Cecil", "epmoon88@gmail.com": "Luna, Frank", "kamrynchea2020@gmail.com": "Chea, Kamryn", "quinnravalle@gmail.com": "Quinn, Ravalle"};
-var SCHEDS = [{"week_start": "2026-06-15", "days": [{"day": "Sunday", "date": "2026-06-14"}, {"day": "Monday", "date": "2026-06-15"}, {"day": "Tuesday", "date": "2026-06-16"}, {"day": "Wednesday", "date": "2026-06-17"}, {"day": "Thursday", "date": "2026-06-18"}, {"day": "Friday", "date": "2026-06-19"}, {"day": "Saturday", "date": "2026-06-20"}], "employees": [{"name": "Llanes, Yasluvia", "section": "Coordinator", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Link, Michael", "section": "Coordinator", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Sandoval Lunn, Ashley", "section": "Coordinator", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Gamban, Biondee Carlo", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Flores, Maritza", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Herrera, Alexis", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "McAllister, Christopher", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Chavarria, America", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Vanderwal, Brynn", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "OFF", "2026-06-17": "7:00-16:00", "2026-06-18": "OFF", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Lewis, Sa'mauri", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Garner, Avner", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "VanArsdale, Trevor", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Riley, Jayden", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Mikasobe, Louie", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Walters, Roxy", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "On-Call", "2026-06-16": "On-Call", "2026-06-17": "On-Call", "2026-06-18": "On-Call", "2026-06-19": "On-Call", "2026-06-20": "OFF"}}, {"name": "Ware, Jada", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "On-Call", "2026-06-16": "On-Call", "2026-06-17": "On-Call", "2026-06-18": "On-Call", "2026-06-19": "On-Call", "2026-06-20": "OFF"}}, {"name": "Penaloza, Tommy", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "On-Call", "2026-06-17": "On-Call", "2026-06-18": "On-Call", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Davis, Rian", "section": "ICQA", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Padua, Breana", "section": "ICQA", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Rick, Reyes", "section": "Label Room", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Villanueva, Chelsy", "section": "Label Room", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Watkins, Traeveyous", "section": "Inbound/Outbound", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Reams, Cecil", "section": "Inbound/Outbound", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "On-Call", "2026-06-19": "OFF", "2026-06-20": "OFF"}}, {"name": "Luna, Frank", "section": "Inbound/Outbound", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Chea, Kamryn", "section": "Inbound/Outbound", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Quinn, Ravalle", "section": "Inbound/Outbound", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-16:00", "2026-06-20": "OFF"}}]}, {"week_start": "2026-06-22", "days": [{"day": "Sunday", "date": "2026-06-21"}, {"day": "Monday", "date": "2026-06-22"}, {"day": "Tuesday", "date": "2026-06-23"}, {"day": "Wednesday", "date": "2026-06-24"}, {"day": "Thursday", "date": "2026-06-25"}, {"day": "Friday", "date": "2026-06-26"}, {"day": "Saturday", "date": "2026-06-27"}], "employees": [{"name": "Llanes, Yasluvia", "section": "Coordinator", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Link, Michael", "section": "Coordinator", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Sandoval Lunn, Ashley", "section": "Coordinator", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Gamban, Biondee Carlo", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Flores, Maritza", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Herrera, Alexis", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "McAllister, Christopher", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Chavarria, America", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Vanderwal, Brynn", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "OFF", "2026-06-24": "7:00-16:00", "2026-06-25": "OFF", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Lewis, Sa'mauri", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Garner, Avner", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "VanArsdale, Trevor", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Riley, Jayden", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Mikasobe, Louie", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Walters, Roxy", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "On-Call", "2026-06-23": "On-Call", "2026-06-24": "On-Call", "2026-06-25": "On-Call", "2026-06-26": "On-Call", "2026-06-27": "OFF"}}, {"name": "Ware, Jada", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "On-Call", "2026-06-23": "On-Call", "2026-06-24": "On-Call", "2026-06-25": "On-Call", "2026-06-26": "On-Call", "2026-06-27": "OFF"}}, {"name": "Penaloza, Tommy", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "On-Call", "2026-06-23": "On-Call", "2026-06-24": "On-Call", "2026-06-25": "On-Call", "2026-06-26": "On-Call", "2026-06-27": "OFF"}}, {"name": "Davis, Rian", "section": "ICQA", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Padua, Breana", "section": "ICQA", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Rick, Reyes", "section": "Label Room", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Villanueva, Chelsy", "section": "Label Room", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Watkins, Traeveyous", "section": "Inbound/Outbound", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Reams, Cecil", "section": "Inbound/Outbound", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "OFF", "2026-06-26": "OFF", "2026-06-27": "OFF"}}, {"name": "Luna, Frank", "section": "Inbound/Outbound", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Chea, Kamryn", "section": "Inbound/Outbound", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Quinn, Ravalle", "section": "Inbound/Outbound", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-16:00", "2026-06-27": "OFF"}}]}];
+var SCHEDS = [{"week_start": "2026-06-15", "days": [{"day": "Sunday", "date": "2026-06-14"}, {"day": "Monday", "date": "2026-06-15"}, {"day": "Tuesday", "date": "2026-06-16"}, {"day": "Wednesday", "date": "2026-06-17"}, {"day": "Thursday", "date": "2026-06-18"}, {"day": "Friday", "date": "2026-06-19"}, {"day": "Saturday", "date": "2026-06-20"}], "employees": [{"name": "Llanes, Yasluvia", "section": "Coordinator", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Link, Michael", "section": "Coordinator", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Sandoval Lunn, Ashley", "section": "Coordinator", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Gamban, Biondee Carlo", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "PTO", "2026-06-20": "OFF"}}, {"name": "Flores, Maritza", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Herrera, Alexis", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "McAllister, Christopher", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "OFF", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Chavarria, America", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Vanderwal, Brynn", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "OFF", "2026-06-17": "7:00-16:00", "2026-06-18": "OFF", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Lewis, Sa'mauri", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Garner, Avner", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "VanArsdale, Trevor", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Riley, Jayden", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Mikasobe, Louie", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Walters, Roxy", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "On-Call", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Ware, Jada", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "On-Call", "2026-06-17": "On-Call", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Penaloza, Tommy", "section": "Production", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "On-Call", "2026-06-18": "7:00-16:00", "2026-06-19": "PTO", "2026-06-20": "OFF"}}, {"name": "Davis, Rian", "section": "ICQA", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Padua, Breana", "section": "ICQA", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Rick, Reyes", "section": "Label Room", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Villanueva, Chelsy", "section": "Label Room", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Watkins, Traeveyous", "section": "Inbound/Outbound", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Reams, Cecil", "section": "Inbound/Outbound", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "On-Call", "2026-06-19": "OFF", "2026-06-20": "OFF"}}, {"name": "Luna, Frank", "section": "Inbound/Outbound", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Chea, Kamryn", "section": "Inbound/Outbound", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-13:30", "2026-06-20": "OFF"}}, {"name": "Quinn, Ravalle", "section": "Inbound/Outbound", "shifts": {"2026-06-14": "OFF", "2026-06-15": "7:00-16:00", "2026-06-16": "7:00-16:00", "2026-06-17": "7:00-16:00", "2026-06-18": "7:00-16:00", "2026-06-19": "7:00-16:00", "2026-06-20": "OFF"}}]}, {"week_start": "2026-06-22", "days": [{"day": "Sunday", "date": "2026-06-21"}, {"day": "Monday", "date": "2026-06-22"}, {"day": "Tuesday", "date": "2026-06-23"}, {"day": "Wednesday", "date": "2026-06-24"}, {"day": "Thursday", "date": "2026-06-25"}, {"day": "Friday", "date": "2026-06-26"}, {"day": "Saturday", "date": "2026-06-27"}], "employees": [{"name": "Llanes, Yasluvia", "section": "Coordinator", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Link, Michael", "section": "Coordinator", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Sandoval Lunn, Ashley", "section": "Coordinator", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Gamban, Biondee Carlo", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "PTO", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "OFF", "2026-06-27": "OFF"}}, {"name": "Flores, Maritza", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "PTO", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Herrera, Alexis", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "PTO", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "McAllister, Christopher", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "PTO", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Chavarria, America", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "PTO", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Vanderwal, Brynn", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "PTO", "2026-06-23": "OFF", "2026-06-24": "7:00-16:00", "2026-06-25": "OFF", "2026-06-26": "OFF", "2026-06-27": "OFF"}}, {"name": "Lewis, Sa'mauri", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "PTO", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Garner, Avner", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "PTO", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "VanArsdale, Trevor", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Riley, Jayden", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Mikasobe, Louie", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Walters, Roxy", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "On-Call", "2026-06-23": "On-Call", "2026-06-24": "On-Call", "2026-06-25": "On-Call", "2026-06-26": "On-Call", "2026-06-27": "OFF"}}, {"name": "Ware, Jada", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "On-Call", "2026-06-23": "On-Call", "2026-06-24": "On-Call", "2026-06-25": "On-Call", "2026-06-26": "On-Call", "2026-06-27": "OFF"}}, {"name": "Penaloza, Tommy", "section": "Production", "shifts": {"2026-06-21": "OFF", "2026-06-22": "On-Call", "2026-06-23": "On-Call", "2026-06-24": "On-Call", "2026-06-25": "On-Call", "2026-06-26": "On-Call", "2026-06-27": "OFF"}}, {"name": "Davis, Rian", "section": "ICQA", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Padua, Breana", "section": "ICQA", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "OFF", "2026-06-27": "OFF"}}, {"name": "Rick, Reyes", "section": "Label Room", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Villanueva, Chelsy", "section": "Label Room", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "PTO", "2026-06-27": "OFF"}}, {"name": "Watkins, Traeveyous", "section": "Inbound/Outbound", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Reams, Cecil", "section": "Inbound/Outbound", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "On-Call", "2026-06-26": "OFF", "2026-06-27": "OFF"}}, {"name": "Luna, Frank", "section": "Inbound/Outbound", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "PTO", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Chea, Kamryn", "section": "Inbound/Outbound", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "OFF", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}, {"name": "Quinn, Ravalle", "section": "Inbound/Outbound", "shifts": {"2026-06-21": "OFF", "2026-06-22": "7:00-16:00", "2026-06-23": "7:00-16:00", "2026-06-24": "7:00-16:00", "2026-06-25": "7:00-16:00", "2026-06-26": "7:00-13:30", "2026-06-27": "OFF"}}]}];
 var curScheds = SCHEDS;
 var curEmail  = "";
 var curAdmin  = false;
@@ -142,6 +235,10 @@ function getPin(e){return getPins()[e]||null;}
 
 // Wire up all buttons immediately — no rebuilding innerHTML
 document.getElementById("loginBtn").onclick = doLogin;
+
+// Wire file inputs
+document.getElementById("fileInputCurrent").addEventListener("change", function(e){ uploadSchedule(e, 0); });
+document.getElementById("fileInputNext").addEventListener("change", function(e){ uploadSchedule(e, 1); });
 document.getElementById("em").onkeydown = function(e){if(e.key==="Enter")document.getElementById("pn").focus();};
 document.getElementById("pn").onkeydown = function(e){if(e.key==="Enter")doLogin();};
 document.getElementById("logoutBtn").onclick = doLogout;
@@ -152,7 +249,7 @@ document.getElementById("cp").onkeydown = function(e){if(e.key==="Enter")savePin
 document.getElementById("srch").oninput = filterTable;
 // manageBtn uses inline onclick
 document.getElementById("addEmpBtn").onclick = addEmployee;
-document.getElementById("fileInput").onchange = uploadSchedule;
+// fileInput uses inline onchange
 
 function doLogin(){
   var em  = document.getElementById("em").value.trim().toLowerCase();
@@ -190,9 +287,9 @@ function enterApp(){
   document.getElementById("appWrap").style.display="block";
   document.getElementById("welcome").textContent = "Welcome, " + (curAdmin ? "Admin" : (USERS[curEmail]||curEmail));
   if(curAdmin) document.getElementById("adminBar").style.display="flex";
-
-  var saved=localStorage.getItem("neato_scheds");
-  if(saved){try{var p=JSON.parse(saved);if(p[0]&&p[0].week_start>=SCHEDS[0].week_start)curScheds=p;}catch(x){}}
+  // Load from Firebase first — this gets the latest schedule
+  loadScheduleFromFirebase();
+  // Build tabs with embedded data immediately as fallback
   buildTabs();
 }
 
@@ -367,46 +464,71 @@ function addEmployee(){
   renderAdmin();
 }
 
-function uploadSchedule(){
-  var f=document.getElementById("fileInput").files[0];
-  if(!f)return;
+function uploadSchedule(evt, weekIdx){
+  if(weekIdx===undefined)weekIdx=0;
+  var f=evt&&evt.target?evt.target.files[0]:null;
+  if(!f){document.getElementById("uploadMsg").textContent="No file selected!";return;}
+  document.getElementById("uploadMsg").textContent="Reading: "+f.name+"...";
   var r=new FileReader();
-  r.onload=function(e){
+  r.onload=function(ev){
     try{
-      var wb=XLSX.read(e.target.result,{type:"binary",cellDates:true});
-      var ws=wb.Sheets[wb.SheetNames[0]];
-      var SKW=["deliveries","coordinator","production","icqa","label room","inbound","outbound","training"];
-      var result=[];
-      [{nc:0,ds:1},{nc:9,ds:10}].forEach(function(cfg){
-        var days=[],emps=[],sec="",maxR=0,seen={};
-        Object.keys(ws).forEach(function(k){if(k[0]!=="!"){var ref=XLSX.utils.decode_cell(k);if(ref.r>maxR)maxR=ref.r;}});
-        for(var c=cfg.ds;c<cfg.ds+7;c++){
-          var dc=XLSX.utils.encode_cell({r:0,c:c}),dtc=XLSX.utils.encode_cell({r:1,c:c});
-          var dn=ws[dc]?String(ws[dc].v||"").trim():["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][c-cfg.ds];
-          var dv=ws[dtc]?ws[dtc].v:null,ds="";
-          if(dv instanceof Date)ds=dv.toISOString().split("T")[0];
-          else if(typeof dv==="number"){var dd=new Date(Math.round((dv-25569)*86400*1000));ds=dd.toISOString().split("T")[0];}
-          days.push({day:dn,date:ds});
-        }
-        for(var row=2;row<=maxR;row++){
-          var nc=XLSX.utils.encode_cell({r:row,c:cfg.nc});if(!ws[nc])continue;
-          var nm=String(ws[nc].v||"").trim();if(!nm)continue;
-          var svs=[];
-          for(var ci=cfg.ds;ci<cfg.ds+7;ci++){var sc=XLSX.utils.encode_cell({r:row,c:ci});svs.push(ws[sc]?String(ws[sc].v||"").trim():"");}
-          var ne=svs.filter(function(v){return v&&v!=="`"&&v!=="'";});
-          if(SKW.some(function(k){return nm.toLowerCase().indexOf(k)!==-1;})||ne.length===0){sec=nm;continue;}
-          if(seen[nm.toLowerCase()])continue;seen[nm.toLowerCase()]=true;
-          var sh={};days.forEach(function(d,di){var v=svs[di];sh[d.date]=v&&v!=="`"&&v!=="'"?v:"OFF";});
-          emps.push({name:nm,section:sec,shifts:sh});
-        }
-        if(days[1]&&days[1].date)result.push({week_start:days[1].date,days:days,employees:emps});
+      var wb=XLSX.read(ev.target.result,{type:"binary",cellDates:true});
+      // Find best weekly sheet
+      var today=new Date();
+      var weeklySheets=wb.SheetNames.filter(function(s){
+        return s.toLowerCase().indexOf("we ")!==-1||s.toLowerCase().indexOf("wk")!==-1||s.toLowerCase().indexOf("week")!==-1;
       });
-      if(!result.length)throw new Error("No schedules found");
-      curScheds=result;
-      localStorage.setItem("neato_scheds",JSON.stringify(result));
+      var bestSheet=null,bestDiff=99999;
+      weeklySheets.forEach(function(sn){
+        var ws2=wb.Sheets[sn];
+        var dc=XLSX.utils.encode_cell({r:1,c:2});
+        if(ws2[dc]){
+          var dv=ws2[dc].v;
+          var d=dv instanceof Date?dv:new Date(Math.round((dv-25569)*86400*1000));
+          var diff=Math.abs(today-d)/86400000;
+          if(diff<bestDiff){bestDiff=diff;bestSheet=sn;}
+        }
+      });
+      var ws=wb.Sheets[bestSheet||wb.SheetNames[0]];
+      var SKW=["deliveries","coordinator","production","icqa","label room","inbound","outbound","training"];
+      var days=[],emps=[],sec="",maxR=0,seen={};
+      Object.keys(ws).forEach(function(k){if(k[0]!=="!"){var ref=XLSX.utils.decode_cell(k);if(ref.r>maxR)maxR=ref.r;}});
+      for(var c=1;c<8;c++){
+        var dc=XLSX.utils.encode_cell({r:0,c:c}),dtc=XLSX.utils.encode_cell({r:1,c:c});
+        var dn=ws[dc]?String(ws[dc].v||"").trim():["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][c-1];
+        var dv=ws[dtc]?ws[dtc].v:null,ds="";
+        if(dv instanceof Date)ds=dv.toISOString().split("T")[0];
+        else if(typeof dv==="number"&&dv>40000){var dd=new Date(Math.round((dv-25569)*86400*1000));ds=dd.toISOString().split("T")[0];}
+        days.push({day:dn,date:ds});
+      }
+      for(var row=2;row<=maxR;row++){
+        var nc=XLSX.utils.encode_cell({r:row,c:0});
+        if(!ws[nc])continue;
+        var nm=String(ws[nc].v||"").trim();if(!nm)continue;
+        var svs=[];
+        for(var ci=1;ci<8;ci++){var sc=XLSX.utils.encode_cell({r:row,c:ci});svs.push(ws[sc]?String(ws[sc].v||"").trim():"");}
+        var ne=svs.filter(function(v){return v&&v!=="`"&&v!=="'";});
+        if(SKW.some(function(k){return nm.toLowerCase().indexOf(k)!==-1;})||ne.length===0){sec=nm;continue;}
+        if(seen[nm.toLowerCase()])continue;seen[nm.toLowerCase()]=true;
+        var sh={};days.forEach(function(d,di){var v=svs[di];sh[d.date]=v&&v!=="`"&&v!=="'"?v:"OFF";});
+        emps.push({name:nm,section:sec,shifts:sh});
+      }
+      var weekStart=days[1]?days[1].date:"";
+      if(!emps.length)throw new Error("No employees found in sheet");
+      var newSched={week_start:weekStart,days:days,employees:emps};
+      curScheds[weekIdx]=newSched;
+      localStorage.setItem("neato_scheds",JSON.stringify(curScheds));
       buildTabs();
-      document.getElementById("uploadMsg").textContent="Schedule updated: "+f.name;
-    }catch(err){document.getElementById("uploadMsg").textContent="Error: "+err.message;}
+      document.getElementById("uploadMsg").textContent="Schedule updated! "+emps.length+" employees, week: "+weekStart;
+      pushScheduleToFirebase(curScheds);
+      // Reset file inputs
+      var fi1=document.getElementById("fileInputCurrent");
+      var fi2=document.getElementById("fileInputNext");
+      if(fi1)fi1.value="";if(fi2)fi2.value="";
+    }catch(err){
+      alert("ERROR: "+err.message);
+      document.getElementById("uploadMsg").textContent="Error: "+err.message;
+    }
   };
   r.readAsBinaryString(f);
 }
