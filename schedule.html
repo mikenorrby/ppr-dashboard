@@ -537,9 +537,7 @@ function uploadSchedule(evt, weekIdx){
       // weekIdx 0 = current week, 1 = next week
       var bestSheet = weekIdx===0 ? (currentSheet||sheetDates[0].name) : (nextSheet||sheetDates[sheetDates.length-1].name);
       var ws=wb.Sheets[bestSheet||wb.SheetNames[0]];
-      var sheetMsg="Sheet: "+bestSheet+" (current="+currentSheet+", next="+nextSheet+", weekIdx="+weekIdx+")";
-      document.getElementById("uploadMsg").textContent=sheetMsg;
-      alert(sheetMsg);
+      document.getElementById("uploadMsg").textContent="Reading sheet: "+bestSheet+"...";
       var SKW=["deliveries","coordinator","production","icqa","label room","inbound","outbound","training"];
       var days=[],emps=[],sec="",maxR=0,seen={};
       Object.keys(ws).forEach(function(k){if(k[0]!=="!"){var ref=XLSX.utils.decode_cell(k);if(ref.r>maxR)maxR=ref.r;}});
