@@ -141,9 +141,7 @@ h2{color:#1F3864;margin-bottom:4px;}
   firebase.initializeApp(firebaseConfig);
   var db = firebase.firestore();
 
-  // Push schedule to Firebase and update display immediately
   function pushScheduleToFirebase(scheds) {
-    // Update display right away — don't wait for Firebase
     window.curScheds = scheds;
     buildTabs();
     db.collection("schedule").doc("current").set({
@@ -156,7 +154,6 @@ h2{color:#1F3864;margin-bottom:4px;}
     });
   }
 
-  // Load schedule from Firebase — compare timestamps to decide which is newer
   function loadScheduleFromFirebase() {
     db.collection("schedule").doc("current").get().then(function(snap) {
       var note = document.getElementById("firebaseNote");
@@ -164,11 +161,8 @@ h2{color:#1F3864;margin-bottom:4px;}
         var saved = JSON.parse(snap.data().data);
         var fbUpdated = snap.data().updated || "";
         if (saved && saved.length > 0) {
-          // Only use Firebase data if it was updated after the HTML was built
-          // Check by comparing week start dates — use whichever has later data
           var fbWeek = saved[0] ? saved[0].week_start : "";
           var embWeek = window.SCHEDS[0] ? window.SCHEDS[0].week_start : "";
-          // Check if Firebase schedule has PTO (indicates it was recently uploaded)
           var fbPTO = saved.some(function(s){
             return s.employees&&s.employees.some(function(e){
               return Object.values(e.shifts||{}).some(function(v){return v==="PTO";});
@@ -179,7 +173,6 @@ h2{color:#1F3864;margin-bottom:4px;}
               return Object.values(e.shifts||{}).some(function(v){return v==="PTO";});
             });
           });
-          // Use Firebase only if BOTH conditions: same or newer week AND has PTO (or embedded doesn't)
           var useFirebase = (fbWeek >= embWeek) && (fbPTO || !embPTO);
           if (useFirebase) {
             window.curScheds = saved;
@@ -198,7 +191,6 @@ h2{color:#1F3864;margin-bottom:4px;}
     });
   }
 
-  // Test Firebase connection
   function testFirebase() {
     document.getElementById("uploadMsg").textContent = "Testing Firebase...";
     db.collection("schedule").doc("test").set({test: "hello", time: new Date().toISOString()})
@@ -210,7 +202,6 @@ h2{color:#1F3864;margin-bottom:4px;}
       });
   }
 
-  // Load when page opens
   window.addEventListener("load", function() {
     loadScheduleFromFirebase();
   });
@@ -234,10 +225,7 @@ function getPins(){try{return JSON.parse(localStorage.getItem("npins")||"{}");}c
 function setPin(e,p){var o=getPins();o[e]=p;localStorage.setItem("npins",JSON.stringify(o));}
 function getPin(e){return getPins()[e]||null;}
 
-// Wire up all buttons immediately — no rebuilding innerHTML
 document.getElementById("loginBtn").onclick = doLogin;
-
-// Wire file inputs
 document.getElementById("fileInputCurrent").addEventListener("change", function(e){ uploadSchedule(e, 0); });
 document.getElementById("fileInputNext").addEventListener("change", function(e){ uploadSchedule(e, 1); });
 document.getElementById("em").onkeydown = function(e){if(e.key==="Enter")document.getElementById("pn").focus();};
@@ -248,9 +236,7 @@ document.getElementById("savePinBtn").onclick = savePin;
 document.getElementById("np").onkeydown = function(e){if(e.key==="Enter")document.getElementById("cp").focus();};
 document.getElementById("cp").onkeydown = function(e){if(e.key==="Enter")savePin();};
 document.getElementById("srch").oninput = filterTable;
-// manageBtn uses inline onclick
 document.getElementById("addEmpBtn").onclick = addEmployee;
-// fileInput uses inline onchange
 
 function clearWeek(idx){
   if(!confirm("Clear the "+(idx===0?"current":"next")+" week schedule? Employees will see 'Schedule Not Yet Posted'."))return;
@@ -259,49 +245,33 @@ function clearWeek(idx){
   localStorage.setItem("neato_scheds", JSON.stringify(curScheds));
   pushScheduleToFirebase(curScheds);
   document.getElementById("uploadMsg").textContent = (idx===0?"Current":"Next")+" week cleared.";
-  // Directly write the not-posted message to the screen
   var NOT_POSTED = "<div style='padding:40px;text-align:center;background:#fff;margin:16px;border-radius:8px;border:2px dashed #ddd;'><div style='font-size:2rem;margin-bottom:12px;'>&#128197;</div><div style='font-weight:700;color:#1F3864;font-size:1.1rem;margin-bottom:8px;'>Schedule Not Yet Posted</div><div style='color:#888;'>Check back later or contact your manager.</div></div>";
-  // Switch to that tab
   document.querySelectorAll(".tab").forEach(function(t,i){ t.classList.toggle("active", i===idx); });
   document.getElementById("schedWrap").innerHTML = NOT_POSTED;
-  document.getElementById("mn").textContent = "";
-  // Override tab click to show not-posted message
+  document.getElementById("myNote").textContent = "";
   var targetTab = document.querySelector(".tab[data-idx='"+idx+"']");
-  if(targetTab){ targetTab.onclick = function(){ 
+  if(targetTab){ targetTab.onclick = function(){
     document.querySelectorAll(".tab").forEach(function(t,i){ t.classList.toggle("active", i===idx); });
     document.getElementById("schedWrap").innerHTML = NOT_POSTED;
   }; }
 }
-
 
 function doLogin(){
   var em  = document.getElementById("em").value.trim().toLowerCase();
   var pin = document.getElementById("pn").value.trim();
   var msg = document.getElementById("loginMsg");
   msg.textContent = "";
-
   if(!em){msg.textContent="Please enter your email.";return;}
   if(!pin||pin.length<4){msg.textContent="Please enter your 4-digit PIN.";return;}
-
-  // Admin check
   if(ADMINS[em] !== undefined){
     if(ADMINS[em] !== pin){msg.textContent="Incorrect PIN.";return;}
-    curEmail=em;curAdmin=true;
-    enterApp();return;
+    curEmail=em;curAdmin=true;enterApp();return;
   }
-
-  // Employee check
   if(USERS[em] === undefined){msg.textContent="Email not found. Contact your manager.";return;}
-
   var stored = getPin(em);
-  if(pin==="1234" && !stored){
-    curEmail=em;curAdmin=false;
-    showChangePin("first");return;
-  }
+  if(pin==="1234" && !stored){curEmail=em;curAdmin=false;showChangePin("first");return;}
   if((stored||"1234") !== pin){msg.textContent="Incorrect PIN. First time? Use: 1234";return;}
-
-  curEmail=em;curAdmin=false;
-  enterApp();
+  curEmail=em;curAdmin=false;enterApp();
 }
 
 function enterApp(){
@@ -310,9 +280,7 @@ function enterApp(){
   document.getElementById("appWrap").style.display="block";
   document.getElementById("welcome").textContent = "Welcome, " + (curAdmin ? "Admin" : (USERS[curEmail]||curEmail));
   if(curAdmin) document.getElementById("adminBar").style.display="flex";
-  // Load from Firebase first — this gets the latest schedule
   loadScheduleFromFirebase();
-  // Build tabs with embedded data immediately as fallback
   buildTabs();
 }
 
@@ -382,7 +350,7 @@ function render(idx){
   var isPosted = s.posted===true || (s.posted===undefined && s.employees && s.employees.length>0);
   if(!isPosted){
     document.getElementById("schedWrap").innerHTML="<div style='padding:40px;text-align:center;color:#888;font-size:1rem;background:#fff;margin:16px;border-radius:8px;border:2px dashed #ddd;'><div style='font-size:2rem;margin-bottom:12px;'>&#128197;</div><div style='font-weight:700;color:#1F3864;font-size:1.1rem;margin-bottom:8px;'>Schedule Not Yet Posted</div><div>Check back later or contact your manager.</div></div>";
-    document.getElementById("mn").textContent="";
+    document.getElementById("myNote").textContent="";
     return;
   }
   var today=new Date().toISOString().split("T")[0];
@@ -392,7 +360,6 @@ function render(idx){
     if(!secs[k]){secs[k]=[];ord.push(k);}
     secs[k].push(e);
   });
-
   var h="<table class='st'><thead>";
   h+="<tr><th style='background:#fff;text-align:left;min-width:170px;'>Employee</th>";
   s.days.forEach(function(d){
@@ -406,7 +373,6 @@ function render(idx){
     h+="<td style='background:"+(it?"#FFEB9C":"#FFFF99")+";color:"+(it?"#9C5700":"#595959")+";text-align:center;font-size:11px;font-weight:700;'>"+lbl+(it?" *":"")+"</td>";
   });
   h+="</tr></thead><tbody>";
-
   ord.forEach(function(sec){
     h+="<tr><td class='sec-hdr' colspan='"+(s.days.length+1)+"'>"+sec+"</td></tr>";
     secs[sec].forEach(function(emp,ei){
@@ -502,28 +468,55 @@ function uploadSchedule(evt, weekIdx){
   r.onload=function(ev){
     try{
       var wb=XLSX.read(ev.target.result,{type:"binary",cellDates:true});
-      // Find best weekly sheet
       var today=new Date();
       today.setHours(0,0,0,0);
-      // Find all weekly sheets with valid date in row 2
-      var weeklySheets=wb.SheetNames.filter(function(s){
-        return s.toLowerCase().indexOf("we ")!==-1||s.toLowerCase().indexOf("wk")!==-1||s.toLowerCase().indexOf("week")!==-1;
-      });
-      // Get date for each weekly sheet
+
+      // ── FIXED: Find weekly sheets by keyword OR by date-style tab name (e.g. "7/3", "7/10") ──
       var sheetDates=[];
-      weeklySheets.forEach(function(sn){
-        var ws2=wb.Sheets[sn];
-        var dc=XLSX.utils.encode_cell({r:1,c:2});
-        if(ws2[dc]){
-          var dv=ws2[dc].v;
-          var d=dv instanceof Date?new Date(dv):new Date(Math.round((dv-25569)*86400*1000));
-          d.setHours(0,0,0,0);
-          sheetDates.push({name:sn,date:d});
+      wb.SheetNames.forEach(function(sn){
+        var snl=sn.toLowerCase().trim();
+        var isKeyword=snl.indexOf("we ")!==-1||snl.indexOf("wk")!==-1||snl.indexOf("week")!==-1;
+        // Match tab names like "7/3", "7/10", "6/28" (end-of-week date format)
+        var dateMatch=sn.trim().match(/^(\d{1,2})\/(\d{1,2})$/);
+        if(isKeyword){
+          // Read date from row 2 col C
+          var ws2=wb.Sheets[sn];
+          var dc=XLSX.utils.encode_cell({r:1,c:2});
+          if(ws2[dc]){
+            var dv=ws2[dc].v;
+            var d=dv instanceof Date?new Date(dv):new Date(Math.round((dv-25569)*86400*1000));
+            d.setHours(0,0,0,0);
+            sheetDates.push({name:sn,date:d});
+          }
+        } else if(dateMatch){
+          // Tab name IS the end-of-week date — e.g. "7/3" means week ending July 3 (Friday)
+          // Monday of that week = end date minus 6 days (Sun) or 4 days (Mon-Fri week)
+          // We treat the tab date as Friday (end of work week), so Monday = tab date - 4
+          var month=parseInt(dateMatch[1],10)-1;
+          var day=parseInt(dateMatch[2],10);
+          var yr=today.getFullYear();
+          var endDate=new Date(yr,month,day,0,0,0,0);
+          // Monday = Friday minus 4 days
+          var startDate=new Date(endDate);
+          startDate.setDate(startDate.getDate()-4);
+          sheetDates.push({name:sn,date:startDate,endDate:endDate});
         }
       });
+
       // Sort by date
       sheetDates.sort(function(a,b){return a.date-b.date;});
-      // Find current week sheet (Monday <= today <= Sunday)
+
+      if(!sheetDates.length){
+        // Fallback: just use first sheet that isn't a summary/template
+        var fallback=wb.SheetNames.filter(function(s){
+          var sl=s.toLowerCase();
+          return sl.indexOf("summary")===-1&&sl.indexOf("template")===-1&&sl.indexOf("master")===-1;
+        });
+        if(fallback.length) sheetDates=[{name:fallback[weekIdx]||fallback[0],date:today}];
+        else sheetDates=[{name:wb.SheetNames[0],date:today}];
+      }
+
+      // Find current and next week sheets
       var currentSheet=null,nextSheet=null;
       sheetDates.forEach(function(sd){
         var monday=sd.date;
@@ -534,10 +527,18 @@ function uploadSchedule(evt, weekIdx){
           nextSheet=sd.name;
         }
       });
+
       // weekIdx 0 = current week, 1 = next week
-      var bestSheet = weekIdx===0 ? (currentSheet||sheetDates[0].name) : (nextSheet||sheetDates[sheetDates.length-1].name);
+      var bestSheet;
+      if(weekIdx===0){
+        bestSheet=currentSheet||sheetDates[0].name;
+      } else {
+        bestSheet=nextSheet||(sheetDates.length>1?sheetDates[sheetDates.length-1].name:sheetDates[0].name);
+      }
+
       var ws=wb.Sheets[bestSheet||wb.SheetNames[0]];
       document.getElementById("uploadMsg").textContent="Reading sheet: "+bestSheet+"...";
+
       var SKW=["deliveries","coordinator","production","icqa","label room","inbound","outbound","training"];
       var days=[],emps=[],sec="",maxR=0,seen={};
       Object.keys(ws).forEach(function(k){if(k[0]!=="!"){var ref=XLSX.utils.decode_cell(k);if(ref.r>maxR)maxR=ref.r;}});
@@ -562,14 +563,13 @@ function uploadSchedule(evt, weekIdx){
         emps.push({name:nm,section:sec,shifts:sh});
       }
       var weekStart=days[1]?days[1].date:"";
-      if(!emps.length)throw new Error("No employees found in sheet");
+      if(!emps.length)throw new Error("No employees found in sheet '"+bestSheet+"'. Check that the sheet name matches the expected format.");
       var newSched={week_start:weekStart,days:days,employees:emps,posted:true};
       curScheds[weekIdx]=newSched;
       localStorage.setItem("neato_scheds",JSON.stringify(curScheds));
       buildTabs();
-      document.getElementById("uploadMsg").textContent="Schedule updated! "+emps.length+" employees, week: "+weekStart;
+      document.getElementById("uploadMsg").textContent="Schedule updated! "+emps.length+" employees loaded from '"+bestSheet+"', week: "+weekStart;
       pushScheduleToFirebase(curScheds);
-      // Reset file inputs
       var fi1=document.getElementById("fileInputCurrent");
       var fi2=document.getElementById("fileInputNext");
       if(fi1)fi1.value="";if(fi2)fi2.value="";
