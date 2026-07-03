@@ -173,7 +173,7 @@ h2{color:#1F3864;margin-bottom:4px;}
               return Object.values(e.shifts||{}).some(function(v){return v==="PTO";});
             });
           });
-          var useFirebase = (fbWeek >= embWeek) && (fbPTO || !embPTO);
+          var useFirebase = (fbWeek >= embWeek);
           if (useFirebase) {
             window.curScheds = saved;
             buildTabs();
