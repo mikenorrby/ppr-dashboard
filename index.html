@@ -55,6 +55,7 @@
   .chart-title { font-size: 0.85rem; color: #94a3b8; margin-bottom: 12px; }
 
   .emp-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .line-summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
   .emp-card {
     background: #1e293b; border-radius: 8px; padding: 12px;
     border-left: 3px solid #2E75B6;
@@ -313,7 +314,7 @@
       <!-- Line Summary -->
       <div class="section">
         <div class="section-title">Line Summary</div>
-        <div class="emp-grid" id="lineSummaryGrid">
+        <div class="line-summary-grid" id="lineSummaryGrid">
           ${['Line 1','Line 2','Line 3','Line 4'].map((ln,i) => {
             const lineEmps = emps.filter(e => e.line === ln);
             const lineUnits = lineEmps.reduce((s,e) => s + e.units, 0);
