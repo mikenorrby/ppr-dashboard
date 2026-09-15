@@ -62,6 +62,7 @@
   .emp-card.l1 { border-color: #1F78B4; }
   .emp-card.l2 { border-color: #2CA02C; }
   .emp-card.l3 { border-color: #D95F02; }
+  .emp-card.l4 { border-color: #8b5cf6; }
   .emp-name  { font-size: 0.85rem; font-weight: 700; color: #f1f5f9; }
   .emp-line  { font-size: 0.7rem; color: #64748b; margin-bottom: 6px; }
   .emp-units { font-size: 1.4rem; font-weight: 700; color: #38bdf8; }
@@ -313,13 +314,13 @@
       <div class="section">
         <div class="section-title">Line Summary</div>
         <div class="emp-grid" id="lineSummaryGrid">
-          ${['Line 1','Line 2','Line 3'].map((ln,i) => {
+          ${['Line 1','Line 2','Line 3','Line 4'].map((ln,i) => {
             const lineEmps = emps.filter(e => e.line === ln);
             const lineUnits = lineEmps.reduce((s,e) => s + e.units, 0);
             const linePPH = lineEmps.length > 0
               ? Math.round(lineEmps.reduce((s,e) => s + e.pph, 0) / lineEmps.length)
               : 0;
-            const cls = ['l1','l2','l3'][i];
+            const cls = ['l1','l2','l3','l4'][i];
             return `
               <div class="emp-card ${cls}" style="text-align:center;">
                 <div class="emp-name" style="font-size:1rem;font-weight:700;">${ln}</div>
@@ -351,7 +352,7 @@
         <div id="empGrid">
         <div class="emp-grid">
           ${emps.map(e => {
-            const cls = e.line==='Line 1'?'l1':e.line==='Line 2'?'l2':'l3';
+            const cls = e.line==='Line 1'?'l1':e.line==='Line 2'?'l2':e.line==='Line 3'?'l3':'l4';
             const tgt = 84;
             const pill = e.pph >= tgt
               ? '<span class="status-pill pill-green">On Target</span>'
@@ -377,7 +378,7 @@
     const empGridEl = document.getElementById('empGrid');
     if (empGridEl) {
       empGridEl.innerHTML = emps.map(e => {
-        const cls = e.line==='Line 1'?'l1':e.line==='Line 2'?'l2':'l3';
+        const cls = e.line==='Line 1'?'l1':e.line==='Line 2'?'l2':e.line==='Line 3'?'l3':'l4';
         const tgt = 84;
         const pill = e.pph >= tgt
           ? '<span class="status-pill pill-green">On Target</span>'
