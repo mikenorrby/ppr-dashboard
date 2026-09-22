@@ -213,7 +213,7 @@
 
   function renderDashboard(d) {
     const total    = d.totalActual || 0;
-    const goal     = d.totalGoal   || 8000;
+    const goal     = d.totalGoal   || 12000;
     const variance = d.variance    || 0;
     const pct      = d.pctGoal     || 0;
     const trend    = d.trendingEOD || 0;
@@ -233,7 +233,7 @@
     const shiftDate   = new Date(d.date + 'T12:00:00');
     const dayOfWeek   = shiftDate.getDay(); // 0=Sun, 5=Fri
     const isFriday    = dayOfWeek === 5;
-    const autoGoal    = isFriday ? 6000 : 8000;
+    const autoGoal    = isFriday ? 9000 : 12000;
 
     // Check for manual override stored in localStorage
     const savedGoal     = localStorage.getItem('ppr_daily_goal_' + d.date);
